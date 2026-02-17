@@ -16,6 +16,7 @@ class LandingAction
                     'banners' => (new BannerAction)->handle(),
                     'categories' => (new CategoryAction)->handle(),
                     'products' => (new ProductAction)->handle(),
+                    'offers' => (new OffersAction)->handle(),
                 ],
             ]
         );

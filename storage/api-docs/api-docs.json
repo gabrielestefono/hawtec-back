@@ -336,20 +336,23 @@
                                                             },
                                                             "subtitle": {
                                                                 "type": "string",
-                                                                "example": "Subtítulo do banner"
+                                                                "example": "Subtítulo do banner",
+                                                                "nullable": true
                                                             },
                                                             "description": {
                                                                 "type": "string",
-                                                                "example": "Descrição do banner"
+                                                                "example": "Descrição do banner",
+                                                                "nullable": true
                                                             },
                                                             "button_label": {
                                                                 "type": "string",
-                                                                "example": "Clique aqui"
+                                                                "example": "Clique aqui",
+                                                                "nullable": true
                                                             },
                                                             "button_url": {
                                                                 "type": "string",
-                                                                "format": "uri",
-                                                                "example": "https://example.com"
+                                                                "example": "https://example.com",
+                                                                "nullable": true
                                                             },
                                                             "is_active": {
                                                                 "type": "boolean",
@@ -362,7 +365,7 @@
                                                             "starts_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00Z",
+                                                                "example": "2026-02-17T00:00:00.000000Z",
                                                                 "nullable": true
                                                             },
                                                             "ends_at": {
@@ -374,12 +377,12 @@
                                                             "created_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00Z"
+                                                                "example": "2026-02-17T00:00:00.000000Z"
                                                             },
                                                             "updated_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00Z"
+                                                                "example": "2026-02-17T00:00:00.000000Z"
                                                             },
                                                             "images": {
                                                                 "type": "array",
@@ -389,15 +392,37 @@
                                                                             "type": "integer",
                                                                             "example": 1
                                                                         },
+                                                                        "imageable_type": {
+                                                                            "type": "string",
+                                                                            "example": "App\\Models\\Banner"
+                                                                        },
+                                                                        "imageable_id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "path": {
+                                                                            "type": "string",
+                                                                            "example": "banners/image.jpg"
+                                                                        },
                                                                         "url": {
                                                                             "type": "string",
                                                                             "format": "uri",
-                                                                            "example": "https://example.com/image.jpg"
+                                                                            "example": "https://example.com/storage/banners/image.jpg"
                                                                         },
                                                                         "alt": {
                                                                             "type": "string",
                                                                             "example": "Descrição da imagem",
                                                                             "nullable": true
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
                                                                         }
                                                                     },
                                                                     "type": "object"
@@ -431,19 +456,307 @@
                                                             },
                                                             "href": {
                                                                 "type": "string",
-                                                                "format": "uri",
                                                                 "example": "/categorias/eletronicos",
                                                                 "nullable": true
                                                             },
                                                             "created_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00Z"
+                                                                "example": "2026-02-17T00:00:00.000000Z"
                                                             },
                                                             "updated_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00Z"
+                                                                "example": "2026-02-17T00:00:00.000000Z"
+                                                            },
+                                                            "products_count": {
+                                                                "type": "integer",
+                                                                "example": 25
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "products": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Smartphone XYZ"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Smartphone de última geração",
+                                                                "nullable": true
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": "1999.99"
+                                                            },
+                                                            "sale_price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": "1899.99",
+                                                                "nullable": true
+                                                            },
+                                                            "has_offer": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "discount_percentage": {
+                                                                "type": "integer",
+                                                                "example": 5,
+                                                                "nullable": true
+                                                            },
+                                                            "badge": {
+                                                                "type": "string",
+                                                                "example": "new",
+                                                                "nullable": true
+                                                            },
+                                                            "stock_quantity": {
+                                                                "type": "integer",
+                                                                "example": 50
+                                                            },
+                                                            "images": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "imageable_type": {
+                                                                            "type": "string",
+                                                                            "example": "App\\Models\\Product"
+                                                                        },
+                                                                        "imageable_id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "path": {
+                                                                            "type": "string",
+                                                                            "example": "products/image.jpg"
+                                                                        },
+                                                                        "url": {
+                                                                            "type": "string",
+                                                                            "format": "uri",
+                                                                            "example": "https://example.com/storage/products/image.jpg"
+                                                                        },
+                                                                        "alt": {
+                                                                            "type": "string",
+                                                                            "example": "Imagem do produto",
+                                                                            "nullable": true
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "category": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Eletrônicos"
+                                                                    },
+                                                                    "description": {
+                                                                        "type": "string",
+                                                                        "example": "Produtos eletrônicos",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "icon": {
+                                                                        "type": "string",
+                                                                        "example": "icon-electronics",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "href": {
+                                                                        "type": "string",
+                                                                        "example": "/categorias/eletronicos",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "reviews_count": {
+                                                                "type": "integer",
+                                                                "example": 15
+                                                            },
+                                                            "reviews_avg_rating": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 4.5,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "offers": {
+                                                    "description": "Produtos em oferta (mesma estrutura de products)",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Tablet ABC"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Tablet com tecnologia avançada",
+                                                                "nullable": true
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": "799.99"
+                                                            },
+                                                            "sale_price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": "599.99"
+                                                            },
+                                                            "has_offer": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "discount_percentage": {
+                                                                "type": "integer",
+                                                                "example": 25
+                                                            },
+                                                            "badge": {
+                                                                "type": "string",
+                                                                "example": "sale",
+                                                                "nullable": true
+                                                            },
+                                                            "stock_quantity": {
+                                                                "type": "integer",
+                                                                "example": 30
+                                                            },
+                                                            "images": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 2
+                                                                        },
+                                                                        "imageable_type": {
+                                                                            "type": "string",
+                                                                            "example": "App\\Models\\Product"
+                                                                        },
+                                                                        "imageable_id": {
+                                                                            "type": "integer",
+                                                                            "example": 2
+                                                                        },
+                                                                        "path": {
+                                                                            "type": "string",
+                                                                            "example": "products/tablet.jpg"
+                                                                        },
+                                                                        "url": {
+                                                                            "type": "string",
+                                                                            "format": "uri",
+                                                                            "example": "https://example.com/storage/products/tablet.jpg"
+                                                                        },
+                                                                        "alt": {
+                                                                            "type": "string",
+                                                                            "example": "Tablet em oferta",
+                                                                            "nullable": true
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "category": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Eletrônicos"
+                                                                    },
+                                                                    "description": {
+                                                                        "type": "string",
+                                                                        "example": "Produtos eletrônicos",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "icon": {
+                                                                        "type": "string",
+                                                                        "example": "icon-electronics",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "href": {
+                                                                        "type": "string",
+                                                                        "example": "/categorias/eletronicos",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "reviews_count": {
+                                                                "type": "integer",
+                                                                "example": 8
+                                                            },
+                                                            "reviews_avg_rating": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 4.2,
+                                                                "nullable": true
                                                             }
                                                         },
                                                         "type": "object"

@@ -15,6 +15,9 @@ class Product extends Model
 
     protected $appends = [
         'current_price',
+        'sale_price',
+        'has_offer',
+        'discount_percentage',
     ];
 
     protected $fillable = [
@@ -57,6 +60,36 @@ class Product extends Model
     public function getCurrentPriceAttribute(): string
     {
         return $this->activeOffer()?->offer_price ?? $this->price;
+    }
+
+    public function getSalePriceAttribute(): ?string
+    {
+        $activeOffer = $this->activeOffer();
+
+        return $activeOffer ? $activeOffer->offer_price : null;
+    }
+
+    public function getHasOfferAttribute(): bool
+    {
+        return $this->activeOffer() !== null;
+    }
+
+    public function getDiscountPercentageAttribute(): ?int
+    {
+        $activeOffer = $this->activeOffer();
+
+        if (! $activeOffer) {
+            return null;
+        }
+
+        $originalPrice = (float) $this->price;
+        $salePrice = (float) $activeOffer->offer_price;
+
+        if ($originalPrice <= 0) {
+            return null;
+        }
+
+        return (int) round((($originalPrice - $salePrice) / $originalPrice) * 100);
     }
 
     public function activeOffer(): ?ProductOffer
