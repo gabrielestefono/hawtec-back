@@ -17,6 +17,7 @@ class LandingAction
                     'categories' => (new CategoryAction)->handle(),
                     'products' => (new ProductAction)->handle(),
                     'offers' => (new OffersAction)->handle(),
+                    'bestsellers' => (new BestsellerAction)->handle(),
                 ],
             ]
         );

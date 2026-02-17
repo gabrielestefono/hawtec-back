@@ -183,6 +183,27 @@ class LandingController extends Controller
                                         type: 'object'
                                     )
                                 ),
+                                new OA\Property(
+                                    property: 'bestsellers',
+                                    type: 'array',
+                                    description: 'Produtos mais vendidos (mesma estrutura de products)',
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: 'id', type: 'integer', example: 3),
+                                            new OA\Property(property: 'name', type: 'string', example: 'Notebook Premium'),
+                                            new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Notebook potente para trabalho'),
+                                            new OA\Property(property: 'price', type: 'string', format: 'decimal', example: '3999.99'),
+                                            new OA\Property(property: 'sale_price', type: 'string', format: 'decimal', nullable: true, example: null),
+                                            new OA\Property(property: 'has_offer', type: 'boolean', example: false),
+                                            new OA\Property(property: 'discount_percentage', type: 'integer', nullable: true, example: null),
+                                            new OA\Property(property: 'badge', type: 'string', nullable: true, example: 'hot'),
+                                            new OA\Property(property: 'stock_quantity', type: 'integer', example: 15),
+                                            new OA\Property(property: 'reviews_count', type: 'integer', example: 42),
+                                            new OA\Property(property: 'reviews_avg_rating', type: 'number', format: 'float', nullable: true, example: 4.8),
+                                        ],
+                                        type: 'object'
+                                    )
+                                ),
                             ]
                         ),
                     ]

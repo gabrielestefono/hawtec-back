@@ -761,6 +761,67 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "bestsellers": {
+                                                    "description": "Produtos mais vendidos (mesma estrutura de products)",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Notebook Premium"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Notebook potente para trabalho",
+                                                                "nullable": true
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": "3999.99"
+                                                            },
+                                                            "sale_price": {
+                                                                "type": "string",
+                                                                "format": "decimal",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "has_offer": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "discount_percentage": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "badge": {
+                                                                "type": "string",
+                                                                "example": "hot",
+                                                                "nullable": true
+                                                            },
+                                                            "stock_quantity": {
+                                                                "type": "integer",
+                                                                "example": 15
+                                                            },
+                                                            "reviews_count": {
+                                                                "type": "integer",
+                                                                "example": 42
+                                                            },
+                                                            "reviews_avg_rating": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 4.8,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 }
                                             },
                                             "type": "object"
