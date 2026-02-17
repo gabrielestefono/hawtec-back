@@ -194,7 +194,31 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Link enviado"
+                        "description": "Link enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Link de reset de senha enviado para o e-mail informado."
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "E-mail inválido"
                     }
                 }
             }
@@ -245,6 +269,9 @@
                 "responses": {
                     "200": {
                         "description": "Senha atualizada"
+                    },
+                    "422": {
+                        "description": "Dados inválidos"
                     }
                 }
             }
@@ -259,6 +286,9 @@
                 "responses": {
                     "200": {
                         "description": "Logout realizado"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
                     }
                 },
                 "security": [
@@ -266,6 +296,114 @@
                         "sanctum": []
                     }
                 ]
+            }
+        },
+        "/api/landing": {
+            "get": {
+                "tags": [
+                    "Landing"
+                ],
+                "summary": "Obter dados da landing page",
+                "operationId": "966077d7d7ff7b23bfa5577c87ea278d",
+                "responses": {
+                    "200": {
+                        "description": "Dados da landing page",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "banners": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Banner Principal"
+                                                    },
+                                                    "subtitle": {
+                                                        "type": "string",
+                                                        "example": "Subtítulo do banner"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Descrição do banner"
+                                                    },
+                                                    "button_label": {
+                                                        "type": "string",
+                                                        "example": "Clique aqui"
+                                                    },
+                                                    "button_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://example.com"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "sort": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "starts_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-17T00:00:00Z",
+                                                        "nullable": true
+                                                    },
+                                                    "ends_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-17T00:00:00Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-17T00:00:00Z"
+                                                    },
+                                                    "images": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "url": {
+                                                                    "type": "string",
+                                                                    "format": "uri",
+                                                                    "example": "https://example.com/image.jpg"
+                                                                },
+                                                                "alt": {
+                                                                    "type": "string",
+                                                                    "example": "Descrição da imagem",
+                                                                    "nullable": true
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
@@ -287,6 +425,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Landing",
+            "description": "Landing"
         }
     ]
 }
