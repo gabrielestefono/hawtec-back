@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -22,6 +23,7 @@ class Product extends Model
         'price',
         'badge',
         'stock_quantity',
+        'product_category_id',
     ];
 
     protected function casts(): array
@@ -34,17 +36,22 @@ class Product extends Model
 
     public function images(): MorphMany
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphMany(related: Image::class, name: 'imageable');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(related: ProductCategory::class, foreignKey: 'product_category_id');
     }
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(ProductReview::class);
+        return $this->hasMany(related: ProductReview::class);
     }
 
     public function offers(): HasMany
     {
-        return $this->hasMany(ProductOffer::class);
+        return $this->hasMany(related: ProductOffer::class);
     }
 
     public function getCurrentPriceAttribute(): string
@@ -54,7 +61,7 @@ class Product extends Model
 
     public function activeOffer(): ?ProductOffer
     {
-        if ($this->relationLoaded('offers')) {
+        if ($this->relationLoaded(key: 'offers')) {
             return $this->offers
                 ->sortByDesc('starts_at')
                 ->first(fn (ProductOffer $offer): bool => $offer->isActive());

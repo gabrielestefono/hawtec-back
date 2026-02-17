@@ -312,90 +312,145 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "banners": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "title": {
-                                                        "type": "string",
-                                                        "example": "Banner Principal"
-                                                    },
-                                                    "subtitle": {
-                                                        "type": "string",
-                                                        "example": "Subtítulo do banner"
-                                                    },
-                                                    "description": {
-                                                        "type": "string",
-                                                        "example": "Descrição do banner"
-                                                    },
-                                                    "button_label": {
-                                                        "type": "string",
-                                                        "example": "Clique aqui"
-                                                    },
-                                                    "button_url": {
-                                                        "type": "string",
-                                                        "format": "uri",
-                                                        "example": "https://example.com"
-                                                    },
-                                                    "is_active": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "sort": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "starts_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2026-02-17T00:00:00Z",
-                                                        "nullable": true
-                                                    },
-                                                    "ends_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": null,
-                                                        "nullable": true
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2026-02-17T00:00:00Z"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2026-02-17T00:00:00Z"
-                                                    },
-                                                    "images": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer",
-                                                                    "example": 1
-                                                                },
-                                                                "url": {
-                                                                    "type": "string",
-                                                                    "format": "uri",
-                                                                    "example": "https://example.com/image.jpg"
-                                                                },
-                                                                "alt": {
-                                                                    "type": "string",
-                                                                    "example": "Descrição da imagem",
-                                                                    "nullable": true
-                                                                }
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Welcome to the API landing page!"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "banners": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
                                                             },
-                                                            "type": "object"
-                                                        }
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Banner Principal"
+                                                            },
+                                                            "subtitle": {
+                                                                "type": "string",
+                                                                "example": "Subtítulo do banner"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Descrição do banner"
+                                                            },
+                                                            "button_label": {
+                                                                "type": "string",
+                                                                "example": "Clique aqui"
+                                                            },
+                                                            "button_url": {
+                                                                "type": "string",
+                                                                "format": "uri",
+                                                                "example": "https://example.com"
+                                                            },
+                                                            "is_active": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "sort": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "starts_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-17T00:00:00Z",
+                                                                "nullable": true
+                                                            },
+                                                            "ends_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-17T00:00:00Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-17T00:00:00Z"
+                                                            },
+                                                            "images": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "url": {
+                                                                            "type": "string",
+                                                                            "format": "uri",
+                                                                            "example": "https://example.com/image.jpg"
+                                                                        },
+                                                                        "alt": {
+                                                                            "type": "string",
+                                                                            "example": "Descrição da imagem",
+                                                                            "nullable": true
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
-                                                "type": "object"
-                                            }
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Eletrônicos"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Produtos eletrônicos em geral",
+                                                                "nullable": true
+                                                            },
+                                                            "icon": {
+                                                                "type": "string",
+                                                                "example": "icon-electronics",
+                                                                "nullable": true
+                                                            },
+                                                            "href": {
+                                                                "type": "string",
+                                                                "format": "uri",
+                                                                "example": "/categorias/eletronicos",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-17T00:00:00Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-17T00:00:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

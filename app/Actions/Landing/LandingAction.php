@@ -14,6 +14,8 @@ class LandingAction
                 'status' => 'success',
                 'data' => [
                     'banners' => (new BannerAction)->handle(),
+                    'categories' => (new CategoryAction)->handle(),
+                    'products' => (new ProductAction)->handle(),
                 ],
             ]
         );

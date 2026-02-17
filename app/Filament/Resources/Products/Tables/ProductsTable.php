@@ -2,22 +2,26 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('offers'))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('offers', 'category'))
             ->columns(components: [
                 TextColumn::make(name: 'name')
                     ->label(label: 'Nome')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make(name: 'category.name')
+                    ->label(label: 'Categoria')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make(name: 'price')

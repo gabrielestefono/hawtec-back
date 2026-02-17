@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Models\ProductCategory;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -46,6 +47,15 @@ class ProductForm
                             ->minValue(value: 0)
                             ->default(state: 0)
                             ->required(),
+                        Select::make(name: 'product_category_id')
+                            ->label(label: 'Categoria')
+                            ->options(
+                                options: ProductCategory::query()
+                                    ->pluck(column: 'name', key: 'id')
+                                    ->toArray()
+                            )
+                            ->searchable()
+                            ->nullable(),
                     ])
                     ->columns(columns: 1),
             ])->columns(columns: 1);
