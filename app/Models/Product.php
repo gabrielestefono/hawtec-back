@@ -12,6 +12,10 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
+    protected $appends = [
+        'current_price',
+    ];
+
     protected $fillable = [
         'name',
         'description',
@@ -36,5 +40,30 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(ProductReview::class);
+    }
+
+    public function offers(): HasMany
+    {
+        return $this->hasMany(ProductOffer::class);
+    }
+
+    public function getCurrentPriceAttribute(): string
+    {
+        return $this->activeOffer()?->offer_price ?? $this->price;
+    }
+
+    public function activeOffer(): ?ProductOffer
+    {
+        if ($this->relationLoaded('offers')) {
+            return $this->offers
+                ->sortByDesc('starts_at')
+                ->first(fn (ProductOffer $offer): bool => $offer->isActive());
+        }
+
+        return $this->offers()
+            ->active()
+            ->orderByDesc('starts_at')
+            ->orderByDesc('id')
+            ->first();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -13,15 +14,19 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('offers'))
             ->columns(components: [
                 TextColumn::make(name: 'name')
                     ->label(label: 'Nome')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make(name: 'price')
-                    ->label(label: 'Preco')
+                    ->label(label: 'Preco base')
                     ->money(currency: 'BRL')
                     ->sortable(),
+                TextColumn::make(name: 'current_price')
+                    ->label(label: 'Preco atual')
+                    ->money(currency: 'BRL'),
                 TextColumn::make(name: 'badge')
                     ->label(label: 'Badge')
                     ->badge()
@@ -35,6 +40,9 @@ class ProductsTable
                 TextColumn::make(name: 'reviews_count')
                     ->label(label: 'Avaliacoes')
                     ->counts(relationships: 'reviews'),
+                TextColumn::make(name: 'offers_count')
+                    ->label(label: 'Ofertas')
+                    ->counts(relationships: 'offers'),
                 TextColumn::make(name: 'updated_at')
                     ->label(label: 'Atualizado em')
                     ->since()
