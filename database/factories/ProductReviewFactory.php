@@ -22,7 +22,9 @@ class ProductReviewFactory extends Factory
             'product_id' => Product::factory(),
             'user_id' => User::factory(),
             'rating' => fake()->numberBetween(int1: 1, int2: 5),
+            'title' => fake()->optional()->sentence(nbWords: 6),
             'comment' => fake()->optional()->sentence(nbWords: 12),
+            'verified' => fake()->boolean(chanceOfGettingTrue: 70),
         ];
     }
 }

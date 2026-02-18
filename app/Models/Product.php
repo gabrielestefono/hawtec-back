@@ -2,12 +2,46 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string $description
+ * @property string $long_description
+ * @property string $brand
+ * @property string $sku
+ * @property string $price
+ * @property string|null $badge
+ * @property int $stock_quantity
+ * @property int $product_category_id
+ * @property array $colors
+ * @property array $specs
+ * @property string $current_price
+ * @property string|null $sale_price
+ * @property bool $has_offer
+ * @property int|null $discount_percentage
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Collection<Image> $images
+ * @property ProductCategory $category
+ * @property Collection<ProductReview> $reviews
+ * @property Collection<ProductOffer> $offers
+ * @property string $current_price
+ * @property string|null $sale_price
+ * @property bool $has_offer
+ * @property int|null $discount_percentage
+ * @property ProductOffer|null $activeOffer
+ * @property float $reviews_rating
+ * @property int $reviews_count
+ */
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
@@ -18,15 +52,23 @@ class Product extends Model
         'sale_price',
         'has_offer',
         'discount_percentage',
+        'reviews_rating',
+        'reviews_count',
     ];
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
+        'long_description',
+        'brand',
+        'sku',
         'price',
         'badge',
         'stock_quantity',
         'product_category_id',
+        'colors',
+        'specs',
     ];
 
     protected function casts(): array
@@ -34,6 +76,8 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'stock_quantity' => 'integer',
+            'colors' => 'array',
+            'specs' => 'array',
         ];
     }
 
@@ -66,7 +110,7 @@ class Product extends Model
     {
         $activeOffer = $this->activeOffer();
 
-        return $activeOffer ? $activeOffer->offer_price : null;
+        return $activeOffer ? $activeOffer->offer_price : $this->price;
     }
 
     public function getHasOfferAttribute(): bool
@@ -89,21 +133,88 @@ class Product extends Model
             return null;
         }
 
-        return (int) round((($originalPrice - $salePrice) / $originalPrice) * 100);
+        return (int) round(num: (($originalPrice - $salePrice) / $originalPrice) * 100);
     }
 
-    public function activeOffer(): ?ProductOffer
+    public function activeOffer(): ProductOffer|null
     {
         if ($this->relationLoaded(key: 'offers')) {
-            return $this->offers
-                ->sortByDesc('starts_at')
-                ->first(fn (ProductOffer $offer): bool => $offer->isActive());
+            /**
+             * @var Collection<ProductOffer> $offers
+             */
+            $offers = $this->offers;
+
+            $offers = $offers->sortByDesc('starts_at');
+
+            /**
+             * @var ProductOffer|null $offer
+             */
+            $offer = $offers->first(callback: fn(ProductOffer $offer): bool => $offer->isActive());
+
+            return $offer;
         }
 
-        return $this->offers()
-            ->active()
-            ->orderByDesc('starts_at')
-            ->orderByDesc('id')
-            ->first();
+        /**
+         * @var HasMany<ProductOffer> $offers
+         */
+        $offers = $this->offers();
+
+        /**
+         * @var HasMany<ProductOffer> $offers
+         */
+        $offers = $offers->active();
+
+        $offers = $offers->orderByDesc(column: 'starts_at');
+
+        $offers = $offers->orderByDesc(column: 'id');
+
+        /**
+         * @var ProductOffer|null $offer
+         */
+        $offer = $offers->first();
+
+        return $offer;
+    }
+
+    public function getReviewsRatingAttribute(): float
+    {
+        if ($this->relationLoaded(key: 'reviews')) {
+            /**
+             * @var Collection<ProductReview> $reviews
+             */
+            $reviews = $this->reviews;
+        } else {
+            /**
+             * @var HasMany<ProductReview> $reviewsHasMany
+             */
+            $reviewsHasMany = $this->reviews();
+
+            /**
+             * @var Collection<ProductReview> $reviews
+             */
+            $reviews = $reviewsHasMany->get();
+        }
+
+
+        if ($reviews->isEmpty() || $avg = $reviews->avg(callback: 'rating') === null) {
+            return 0;
+        }
+
+        return round(num: $avg, precision: 2);
+    }
+
+    public function getReviewsCountAttribute(): int
+    {
+        if ($this->relationLoaded(key: 'reviews')) {
+            /**
+             * @var Collection<ProductReview> $reviews
+             */
+            $reviews = $this->reviews;
+
+            $count = $reviews->count();
+            return $count;
+        }
+
+        return $this->reviews()->count();
     }
 }

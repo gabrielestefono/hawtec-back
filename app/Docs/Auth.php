@@ -19,6 +19,4 @@ use OpenApi\Attributes as OA;
 #[OA\PathItem(
     path: '/api/auth/logout'
 )]
-class Auth
-{
-}
+class Auth {}

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LandingController;
+use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,9 @@ Route::prefix('auth')->group(callback: function (): void {
 
 Route::prefix('landing')->group(callback: function (): void {
     Route::get(uri: '/', action: [LandingController::class, 'index']);
+});
+
+Route::prefix('products')->group(callback: function (): void {
+    Route::get(uri: '/', action: [ProductController::class, 'index']);
+    Route::get(uri: '/{product:slug}', action: [ProductController::class, 'show']);
 });

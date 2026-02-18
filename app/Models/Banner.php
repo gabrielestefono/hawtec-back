@@ -2,10 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string $subtitle
+ * @property string $description
+ * @property string $button_label
+ * @property string $button_url
+ * @property bool $is_active
+ * @property int $sort
+ * @property Collection<Image> $images
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class Banner extends Model
 {
     /** @use HasFactory<\Database\Factories\BannerFactory> */
@@ -34,6 +51,6 @@ class Banner extends Model
 
     public function images(): MorphMany
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphMany(related: Image::class, name: 'imageable');
     }
 }

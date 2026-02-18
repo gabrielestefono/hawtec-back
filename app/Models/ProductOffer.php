@@ -7,7 +7,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $product_id
+ * @property string $offer_price
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ * @property int $quantity_limit
+ * @property int $quantity_sold
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class ProductOffer extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductOfferFactory> */

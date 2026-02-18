@@ -14,10 +14,10 @@ use OpenApi\Attributes as OA;
         new OA\Server(
             url: '/',
             description: 'Servidor padrão'
-        )
+        ),
     ],
     security: [
-        ['sanctum' => []]
+        ['sanctum' => []],
     ]
 )]
 #[OA\SecurityScheme(
@@ -26,6 +26,4 @@ use OpenApi\Attributes as OA;
     scheme: 'bearer',
     bearerFormat: 'Token'
 )]
-class OpenApi
-{
-}
+class OpenApi {}

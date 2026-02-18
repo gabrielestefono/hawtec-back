@@ -834,6 +834,344 @@
                     }
                 }
             }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Listar e filtrar produtos",
+                "operationId": "d97d1c3727cbac49708b85f7d11f7d58",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Termo de busca para nome e descrição do produto",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "notebook"
+                        }
+                    },
+                    {
+                        "name": "categories[]",
+                        "in": "query",
+                        "description": "IDs das categorias para filtrar (pode enviar múltiplos)",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    {
+                        "name": "price_min",
+                        "in": "query",
+                        "description": "Preço mínimo",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "price_max",
+                        "in": "query",
+                        "description": "Preço máximo",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 5000
+                        }
+                    },
+                    {
+                        "name": "ratings[]",
+                        "in": "query",
+                        "description": "Notas de avaliação para filtrar (1-5, pode enviar múltiplas)",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "enum": [
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "only_offers",
+                        "in": "query",
+                        "description": "Filtrar apenas produtos em promoção",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "in_stock",
+                        "in": "query",
+                        "description": "Filtrar apenas produtos em estoque",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Critério de ordenação",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "newest",
+                                "biggest_discount",
+                                "most_reviewed",
+                                "best_rating",
+                                "highest_price",
+                                "lowest_price",
+                                "most_relevant"
+                            ],
+                            "example": "newest"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Número de itens por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número da página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de produtos filtrados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Produtos recuperados com sucesso"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "products": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Notebook Dell Inspiron"
+                                                                    },
+                                                                    "description": {
+                                                                        "type": "string",
+                                                                        "example": "Notebook potente para trabalho"
+                                                                    },
+                                                                    "price": {
+                                                                        "type": "string",
+                                                                        "example": "3500.00"
+                                                                    },
+                                                                    "badge": {
+                                                                        "type": "string",
+                                                                        "example": "Lançamento",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "stock_quantity": {
+                                                                        "type": "integer",
+                                                                        "example": 10
+                                                                    },
+                                                                    "product_category_id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "current_price": {
+                                                                        "type": "string",
+                                                                        "example": "2999.00"
+                                                                    },
+                                                                    "sale_price": {
+                                                                        "type": "string",
+                                                                        "example": "2999.00",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "has_offer": {
+                                                                        "type": "boolean",
+                                                                        "example": true
+                                                                    },
+                                                                    "discount_percentage": {
+                                                                        "type": "integer",
+                                                                        "example": 14,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "average_rating": {
+                                                                        "type": "number",
+                                                                        "format": "float",
+                                                                        "example": 4.5,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "reviews_count": {
+                                                                        "type": "integer",
+                                                                        "example": 25
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    },
+                                                                    "category": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "integer",
+                                                                                "example": 1
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Eletrônicos"
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    },
+                                                                    "images": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer"
+                                                                                },
+                                                                                "path": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "url": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "alt": {
+                                                                                    "type": "string",
+                                                                                    "nullable": true
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "first_page_url": {
+                                                            "type": "string"
+                                                        },
+                                                        "from": {
+                                                            "type": "integer"
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "last_page_url": {
+                                                            "type": "string"
+                                                        },
+                                                        "next_page_url": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "path": {
+                                                            "type": "string"
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "prev_page_url": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "to": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -858,6 +1196,10 @@
         {
             "name": "Landing",
             "description": "Landing"
+        },
+        {
+            "name": "Products",
+            "description": "Products"
         }
     ]
 }

@@ -47,7 +47,7 @@ class AuthController extends Controller
     )]
     public function register(RegisterRequest $request): JsonResponse
     {
-        return (new RegisterAction())->handle(request: $request);
+        return (new RegisterAction)->handle(request: $request);
     }
 
     #[OA\Post(
@@ -86,7 +86,7 @@ class AuthController extends Controller
     )]
     public function login(LoginRequest $request): JsonResponse
     {
-        return (new LoginAction())->handle(request: $request);
+        return (new LoginAction)->handle(request: $request);
     }
 
     #[OA\Post(
@@ -113,10 +113,9 @@ class AuthController extends Controller
             new OA\Response(response: '422', description: 'E-mail inválido'),
         ]
     )]
-
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        return (new ForgotPasswordAction())->handle(request: $request);
+        return (new ForgotPasswordAction)->handle(request: $request);
     }
 
     #[OA\Post(
@@ -142,7 +141,7 @@ class AuthController extends Controller
     )]
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        return (new ResetPasswordAction())->handle(request: $request);
+        return (new ResetPasswordAction)->handle(request: $request);
     }
 
     #[OA\Post(
@@ -157,6 +156,6 @@ class AuthController extends Controller
     )]
     public function logout(): JsonResponse
     {
-        return (new LogoutAction())->handle();
+        return (new LogoutAction)->handle();
     }
 }

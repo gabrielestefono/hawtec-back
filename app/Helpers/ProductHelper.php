@@ -6,13 +6,14 @@ use App\Models\Product;
 
 class ProductHelper
 {
-    public static function getDiscountPercentage(Product $product): int
+    public static function getReviewAverageRating(Product $product): float
     {
-        if ($product->offers->isEmpty()) {
+        $reviews = $product->reviews;
+
+        if ($reviews->isEmpty()) {
             return 0;
         }
 
-        // $originalPrice = $product->price;
-        return 0;
+        return $reviews->avg(callback: 'rating') ?? 0;
     }
 }

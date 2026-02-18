@@ -26,9 +26,9 @@ class RegisterAction
 
         return response()->json(
             data: [
-                "status" => StatusResponse::SUCCESS,
-                "message" => "Usuário criado com sucesso.",
-                "data" => []
+                'status' => StatusResponse::SUCCESS,
+                'message' => 'Usuário criado com sucesso.',
+                'data' => [],
             ]
         );
     }

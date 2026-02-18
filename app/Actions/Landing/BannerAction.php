@@ -2,7 +2,6 @@
 
 namespace App\Actions\Landing;
 
-use App\Helpers\ImageHelper;
 use App\Models\Banner;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,7 +12,7 @@ class BannerAction
     {
         $now = now();
 
-        $banners = Banner::query()
+        return Banner::query()
             ->where(column: 'is_active', operator: '=', value: true)
             ->where(column: function (Builder $query) use ($now): void {
                 $query->whereNull(columns: 'starts_at')
@@ -26,15 +25,5 @@ class BannerAction
             ->orderBy(column: 'sort')
             ->with(relations: 'images')
             ->get();
-
-        $banners->map(callback: function (Banner $banner): Banner {
-            $banner->images->map(callback: function ($image): void {
-                $image->url = ImageHelper::getImageUrl(path: $image->path);
-            });
-
-            return $banner;
-        });
-
-        return $banners;
     }
 }

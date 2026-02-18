@@ -21,6 +21,13 @@ class ProductForm
                             ->label(label: 'Nome')
                             ->required()
                             ->maxLength(length: 255),
+                        TextInput::make(name: 'slug')
+                            ->label(label: 'Slug')
+                            ->required()
+                            ->maxLength(length: 255)
+                            ->placeholder(placeholder: 'notebook-dell-inspiron')
+                            ->helperText(text: 'URL amigável em minúsculas sem espaços.')
+                            ->unique(ignoreRecord: true),
                         Textarea::make(name: 'description')
                             ->label(label: 'Descricao')
                             ->rows(rows: 3),

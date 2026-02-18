@@ -23,14 +23,13 @@ class LogoutAction
          */
         $user = $auth->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(data: [
                 'status' => StatusResponse::ERROR,
                 'message' => 'Usuário não autenticado.',
                 'data' => [],
             ], status: 401);
         }
-
 
         /**
          * @var PersonalAccessToken $accessToken

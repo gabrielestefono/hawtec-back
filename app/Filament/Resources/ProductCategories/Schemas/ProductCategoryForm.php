@@ -30,14 +30,13 @@ class ProductCategoryForm
                             ->placeholder(placeholder: 'heroicon-o-device-phone-mobile')
                             ->helperText(text: 'Use aliases Heroicon, por exemplo heroicon-o-device-phone-mobile.')
                             ->rule(rule: 'regex:/^heroicon-[a-z]-[a-z0-9-]+$/'),
-                        TextInput::make(name: 'href')
-                            ->label(label: 'Href interno')
+                        TextInput::make(name: 'slug')
+                            ->label(label: 'Slug')
                             ->required()
                             ->maxLength(length: 255)
-                            ->placeholder(placeholder: '/celulares')
-                            ->helperText(text: 'Somente caminhos internos iniciando com /.')
-                            ->unique(ignoreRecord: true)
-                            ->rule(rule: 'regex:/^\\/[a-z0-9\\/-]*$/'),
+                            ->placeholder(placeholder: 'celulares')
+                            ->helperText(text: 'URL amigável em minúsculas sem espaços.')
+                            ->unique(ignoreRecord: true),
                     ])
                     ->columns(columns: 1),
             ])->columns(columns: 1);

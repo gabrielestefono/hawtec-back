@@ -32,12 +32,12 @@ class LoginAction
         }
 
         return response()->json(data: [
-            "status" => StatusResponse::SUCCESS,
-            "message" => "Login realizado com sucesso.",
-            "data" => [
+            'status' => StatusResponse::SUCCESS,
+            'message' => 'Login realizado com sucesso.',
+            'data' => [
                 'user' => $user,
                 'token' => $user->createToken(name: 'api')->plainTextToken,
-            ]
+            ],
         ]);
     }
 }
