@@ -28,32 +28,15 @@ class ProductForm
                             ->placeholder(placeholder: 'notebook-dell-inspiron')
                             ->helperText(text: 'URL amigável em minúsculas sem espaços.')
                             ->unique(ignoreRecord: true),
+                        TextInput::make(name: 'brand')
+                            ->label(label: 'Marca')
+                            ->maxLength(length: 255),
                         Textarea::make(name: 'description')
-                            ->label(label: 'Descricao')
+                            ->label(label: 'Descrição curta')
                             ->rows(rows: 3),
-                        TextInput::make(name: 'price')
-                            ->label(label: 'Preco')
-                            ->required()
-                            ->numeric()
-                            ->minValue(value: 0)
-                            ->step(interval: 0.01)
-                            ->prefix(label: 'R$'),
-                        Select::make(name: 'badge')
-                            ->label(label: 'Badge')
-                            ->options(options: [
-                                'new' => 'new',
-                                'sale' => 'sale',
-                                'hot' => 'hot',
-                            ])
-                            ->searchable()
-                            ->nullable(),
-                        TextInput::make(name: 'stock_quantity')
-                            ->label(label: 'Quantidade em estoque')
-                            ->numeric()
-                            ->integer()
-                            ->minValue(value: 0)
-                            ->default(state: 0)
-                            ->required(),
+                        Textarea::make(name: 'long_description')
+                            ->label(label: 'Descrição longa')
+                            ->rows(rows: 5),
                         Select::make(name: 'product_category_id')
                             ->label(label: 'Categoria')
                             ->options(

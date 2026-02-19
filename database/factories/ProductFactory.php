@@ -24,27 +24,24 @@ class ProductFactory extends Factory
             'description' => fake()->optional()->sentence(nbWords: 6),
             'long_description' => fake()->optional()->paragraphs(nb: 2, asText: true),
             'brand' => fake()->optional()->word(),
-            'sku' => fake()->optional()->bothify(string: 'SKU-########'),
-            'price' => fake()->randomFloat(nbMaxDecimals: 2, min: 99, max: 9999),
-            'badge' => fake()->optional()->randomElement(array: ['novo', 'desconto', 'destaque']),
-            'stock_quantity' => fake()->numberBetween(int1: 0, int2: 200),
+            'product_category_id' => 1,
         ];
     }
 
-    public function withColors(int $count = 3): self
+    public function withVariants(int $count = 3): self
     {
         return $this->afterCreating(function ($product) use ($count) {
-            $product->colors()->createMany(
-                ProductColorFactory::new()->count($count)->make()->toArray()
+            $product->variants()->createMany(
+                ProductVariantFactory::new()->count($count)->make()->toArray()
             );
         });
     }
 
-    public function withSpecs(int $count = 3): self
+    public function withBadges(int $count = 1): self
     {
         return $this->afterCreating(function ($product) use ($count) {
-            $product->specs()->createMany(
-                ProductSpecFactory::new()->count($count)->make()->toArray()
+            $product->badges()->createMany(
+                ProductBadgeFactory::new()->count($count)->make()->toArray()
             );
         });
     }

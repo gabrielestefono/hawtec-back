@@ -10,7 +10,8 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $order_id
- * @property int $product_id
+ * @property int|null $product_id
+ * @property int|null $product_variant_id
  * @property int $quantity
  * @property string $price
  * @property Carbon $created_at
@@ -23,6 +24,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_id',
+        'product_variant_id',
         'quantity',
         'price',
     ];
@@ -43,5 +45,10 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 }

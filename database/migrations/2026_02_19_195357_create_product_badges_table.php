@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_colors', function (Blueprint $table) {
+        Schema::create('product_badges', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('hex_code')->nullable();
+            $table->enum('badge_type', ['new', 'promotion', 'popular', 'bestseller', 'limited', 'exclusive']);
+            $table->timestamp('valid_from')->nullable();
+            $table->timestamp('valid_until')->nullable();
             $table->timestamps();
-
-            $table->unique(['product_id', 'name']);
+            $table->unique(['product_id', 'badge_type']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_colors');
+        Schema::dropIfExists('product_badges');
     }
 };

@@ -46,44 +46,14 @@ class FilterProductsAction
      */
     protected function applyPriceRange(Builder $query, ?float $priceMin, ?float $priceMax): void
     {
-        if ($priceMin !== null) {
-            // Considera o preço original do produto
-            $query->where(function (Builder $query) use ($priceMin): void {
-                // Produtos sem oferta
-                $query->where(function (Builder $q) use ($priceMin): void {
-                    $q->whereDoesntHave(relation: 'offers', callback: function (Builder $q): void {
-                        /** @var Builder $q */
-                        $q->active();
-                    })
-                        ->where(column: 'price', operator: '>=', value: $priceMin);
-                })
-                    // Produtos com oferta
-                    ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMin): void {
-                        /** @var Builder $q */
-                        /** @var Builder $activeOffers */
-                        $activeOffers = $q->active();
-                        $activeOffers->where('offer_price', '>=', $priceMin);
-                    });
-            });
-        }
-
-        if ($priceMax !== null) {
-            $query->where(function (Builder $query) use ($priceMax): void {
-                // Produtos sem oferta
-                $query->where(function (Builder $q) use ($priceMax): void {
-                    $q->whereDoesntHave(relation: 'offers', callback: function (Builder $q): void {
-                        /** @var Builder $q */
-                        $q->active();
-                    })
-                        ->where(column: 'price', operator: '<=', value: $priceMax);
-                })
-                    // Produtos com oferta
-                    ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMax): void {
-                        /** @var Builder $q */
-                        /** @var Builder $activeOffers */
-                        $activeOffers = $q->active();
-                        $activeOffers->where('offer_price', '<=', $priceMax);
-                    });
+        if ($priceMin !== null || $priceMax !== null) {
+            $query->whereHas(relation: 'variants', callback: function (Builder $q) use ($priceMin, $priceMax): void {
+                if ($priceMin !== null) {
+                    $q->where(column: 'price', operator: '>=', value: $priceMin);
+                }
+                if ($priceMax !== null) {
+                    $q->where(column: 'price', operator: '<=', value: $priceMax);
+                }
             });
         }
     }
@@ -127,7 +97,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->where(column: 'stock_quantity', operator: '>', value: 0);
+        $query->whereHas(relation: 'variants', callback: fn (Builder $q): mixed => $q->where(column: 'stock_quantity', operator: '>', value: 0));
     }
 
     /**
@@ -199,7 +169,7 @@ class FilterProductsAction
      */
     protected function sortByHighestPrice(Builder $query): void
     {
-        $query->orderByRaw(sql: 'COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()) LIMIT 1), products.price) DESC');
+        $query->orderByRaw(sql: 'COALESCE((SELECT MAX(price) FROM product_variants WHERE product_variants.product_id = products.id LIMIT 1), 0) DESC');
     }
 
     /**
@@ -207,7 +177,7 @@ class FilterProductsAction
      */
     protected function sortByLowestPrice(Builder $query): void
     {
-        $query->orderByRaw(sql: 'COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()) LIMIT 1), products.price) ASC');
+        $query->orderByRaw(sql: 'COALESCE((SELECT MIN(price) FROM product_variants WHERE product_variants.product_id = products.id LIMIT 1), 0) ASC');
     }
 
     /**
@@ -246,6 +216,7 @@ class FilterProductsAction
                 relations: [
                     'category:id,name',
                     'images',
+                    'variants',
                     'offers' => fn (HasMany $query): mixed => $query->active(),
                 ]
             )

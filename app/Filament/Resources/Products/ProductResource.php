@@ -5,11 +5,11 @@ namespace App\Filament\Resources\Products;
 use App\Filament\Resources\Products\Pages\CreateProduct;
 use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
-use App\Filament\Resources\Products\RelationManagers\ColorsRelationManager;
+use App\Filament\Resources\Products\RelationManagers\BadgesRelationManager;
 use App\Filament\Resources\Products\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\Products\RelationManagers\OffersRelationManager;
 use App\Filament\Resources\Products\RelationManagers\ReviewsRelationManager;
-use App\Filament\Resources\Products\RelationManagers\SpecsRelationManager;
+use App\Filament\Resources\Products\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\Products\Schemas\ProductForm;
 use App\Filament\Resources\Products\Tables\ProductsTable;
 use App\Models\Product;
@@ -44,8 +44,8 @@ class ProductResource extends Resource
     {
         return [
             ImagesRelationManager::class,
-            ColorsRelationManager::class,
-            SpecsRelationManager::class,
+            VariantsRelationManager::class,
+            BadgesRelationManager::class,
             OffersRelationManager::class,
             ReviewsRelationManager::class,
         ];

@@ -11,11 +11,12 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int $product_id
+ * @property int|null $product_id
+ * @property int|null $product_variant_id
  * @property string $offer_price
- * @property Carbon $starts_at
- * @property Carbon $ends_at
- * @property int $quantity_limit
+ * @property Carbon|null $starts_at
+ * @property Carbon|null $ends_at
+ * @property int|null $quantity_limit
  * @property int $quantity_sold
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -27,6 +28,7 @@ class ProductOffer extends Model
 
     protected $fillable = [
         'product_id',
+        'product_variant_id',
         'offer_price',
         'starts_at',
         'ends_at',
@@ -48,6 +50,11 @@ class ProductOffer extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     public function scopeActive(Builder $query, ?CarbonInterface $at = null): Builder

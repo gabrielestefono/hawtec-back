@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProductColor extends Model
+class StorageOption extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductColorFactory> */
+    /** @use HasFactory<\Database\Factories\StorageOptionFactory> */
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'hex_code',
+        'value_gb',
     ];
 
     public function variants(): HasMany
     {
-        return $this->hasMany(ProductVariant::class, 'color_id');
+        return $this->hasMany(ProductVariant::class, 'storage_id');
     }
 }
