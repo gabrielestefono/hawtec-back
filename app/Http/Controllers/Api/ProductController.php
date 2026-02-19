@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Product\FilterProductsAction;
+use App\Actions\Product\ShowProductAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\FilterProductsRequest;
-use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
 
 class ProductController extends Controller
@@ -359,10 +358,8 @@ class ProductController extends Controller
             ),
         ]
     )]
-    public function show(Product $product): JsonResource
+    public function show(Product $product): JsonResponse
     {
-        $product->loadMissing(['images', 'category', 'reviews.user']);
-
-        return new ProductResource(resource: $product);
+        return (new ShowProductAction)->handle(product: $product);
     }
 }

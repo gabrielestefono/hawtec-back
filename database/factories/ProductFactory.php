@@ -28,14 +28,24 @@ class ProductFactory extends Factory
             'price' => fake()->randomFloat(nbMaxDecimals: 2, min: 99, max: 9999),
             'badge' => fake()->optional()->randomElement(array: ['novo', 'desconto', 'destaque']),
             'stock_quantity' => fake()->numberBetween(int1: 0, int2: 200),
-            'colors' => [
-                ['name' => 'Preto', 'value' => '#1a1a1a', 'available' => true],
-                ['name' => 'Branco', 'value' => '#ffffff', 'available' => fake()->boolean()],
-            ],
-            'specs' => [
-                ['label' => 'Peso', 'value' => fake()->numberBetween(100, 5000).' g'],
-                ['label' => 'Garantia', 'value' => fake()->numberBetween(1, 5).' anos'],
-            ],
         ];
+    }
+
+    public function withColors(int $count = 3): self
+    {
+        return $this->afterCreating(function ($product) use ($count) {
+            $product->colors()->createMany(
+                ProductColorFactory::new()->count($count)->make()->toArray()
+            );
+        });
+    }
+
+    public function withSpecs(int $count = 3): self
+    {
+        return $this->afterCreating(function ($product) use ($count) {
+            $product->specs()->createMany(
+                ProductSpecFactory::new()->count($count)->make()->toArray()
+            );
+        });
     }
 }

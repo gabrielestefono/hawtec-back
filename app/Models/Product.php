@@ -22,8 +22,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $badge
  * @property int $stock_quantity
  * @property int $product_category_id
- * @property array $colors
- * @property array $specs
  * @property string $current_price
  * @property string|null $sale_price
  * @property bool $has_offer
@@ -34,10 +32,8 @@ use Illuminate\Support\Carbon;
  * @property ProductCategory $category
  * @property Collection<ProductReview> $reviews
  * @property Collection<ProductOffer> $offers
- * @property string $current_price
- * @property string|null $sale_price
- * @property bool $has_offer
- * @property int|null $discount_percentage
+ * @property Collection<ProductColor> $colors
+ * @property Collection<ProductSpec> $specs
  * @property ProductOffer|null $activeOffer
  * @property float $reviews_rating
  * @property int $reviews_count
@@ -67,8 +63,6 @@ class Product extends Model
         'badge',
         'stock_quantity',
         'product_category_id',
-        'colors',
-        'specs',
     ];
 
     protected function casts(): array
@@ -76,8 +70,6 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'stock_quantity' => 'integer',
-            'colors' => 'array',
-            'specs' => 'array',
         ];
     }
 
@@ -99,6 +91,16 @@ class Product extends Model
     public function offers(): HasMany
     {
         return $this->hasMany(related: ProductOffer::class);
+    }
+
+    public function colors(): HasMany
+    {
+        return $this->hasMany(related: ProductColor::class);
+    }
+
+    public function specs(): HasMany
+    {
+        return $this->hasMany(related: ProductSpec::class);
     }
 
     public function getCurrentPriceAttribute(): string
@@ -136,7 +138,7 @@ class Product extends Model
         return (int) round(num: (($originalPrice - $salePrice) / $originalPrice) * 100);
     }
 
-    public function activeOffer(): ProductOffer|null
+    public function activeOffer(): ?ProductOffer
     {
         if ($this->relationLoaded(key: 'offers')) {
             /**
@@ -149,7 +151,7 @@ class Product extends Model
             /**
              * @var ProductOffer|null $offer
              */
-            $offer = $offers->first(callback: fn(ProductOffer $offer): bool => $offer->isActive());
+            $offer = $offers->first(callback: fn (ProductOffer $offer): bool => $offer->isActive());
 
             return $offer;
         }
@@ -195,7 +197,6 @@ class Product extends Model
             $reviews = $reviewsHasMany->get();
         }
 
-
         if ($reviews->isEmpty() || $avg = $reviews->avg(callback: 'rating') === null) {
             return 0;
         }
@@ -212,6 +213,7 @@ class Product extends Model
             $reviews = $this->reviews;
 
             $count = $reviews->count();
+
             return $count;
         }
 
