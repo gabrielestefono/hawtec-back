@@ -303,11 +303,12 @@
                 "tags": [
                     "Landing"
                 ],
-                "summary": "Obter dados da landing page",
+                "summary": "Obter dados completos da landing page",
+                "description": "Retorna todos os dados necessários para montar a página inicial: banners ativos, categorias, produtos em destaque, ofertas e mais vendidos.",
                 "operationId": "966077d7d7ff7b23bfa5577c87ea278d",
                 "responses": {
                     "200": {
-                        "description": "Dados da landing page",
+                        "description": "Dados da landing page retornados com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -323,6 +324,7 @@
                                         "data": {
                                             "properties": {
                                                 "banners": {
+                                                    "description": "Banners ativos ordenados por sort (apenas banners dentro do período starts_at/ends_at e is_active=true)",
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
@@ -332,26 +334,26 @@
                                                             },
                                                             "title": {
                                                                 "type": "string",
-                                                                "example": "Banner Principal"
+                                                                "example": "Super Oferta de Verão"
                                                             },
                                                             "subtitle": {
                                                                 "type": "string",
-                                                                "example": "Subtítulo do banner",
+                                                                "example": "Até 50% de desconto",
                                                                 "nullable": true
                                                             },
                                                             "description": {
                                                                 "type": "string",
-                                                                "example": "Descrição do banner",
+                                                                "example": "Aproveite descontos incríveis em produtos selecionados",
                                                                 "nullable": true
                                                             },
                                                             "button_label": {
                                                                 "type": "string",
-                                                                "example": "Clique aqui",
+                                                                "example": "Ver Ofertas",
                                                                 "nullable": true
                                                             },
                                                             "button_url": {
                                                                 "type": "string",
-                                                                "example": "https://example.com",
+                                                                "example": "/ofertas",
                                                                 "nullable": true
                                                             },
                                                             "is_active": {
@@ -359,32 +361,34 @@
                                                                 "example": true
                                                             },
                                                             "sort": {
+                                                                "description": "Ordem de exibição (menor valor = maior prioridade)",
                                                                 "type": "integer",
                                                                 "example": 1
                                                             },
                                                             "starts_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00.000000Z",
+                                                                "example": "2026-02-15T00:00:00.000000Z",
                                                                 "nullable": true
                                                             },
                                                             "ends_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": null,
+                                                                "example": "2026-02-28T23:59:59.000000Z",
                                                                 "nullable": true
                                                             },
                                                             "created_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00.000000Z"
+                                                                "example": "2026-02-17T10:30:00.000000Z"
                                                             },
                                                             "updated_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00.000000Z"
+                                                                "example": "2026-02-17T10:30:00.000000Z"
                                                             },
                                                             "images": {
+                                                                "description": "Imagens do banner (via relacionamento polimórfico)",
                                                                 "type": "array",
                                                                 "items": {
                                                                     "properties": {
@@ -402,27 +406,22 @@
                                                                         },
                                                                         "path": {
                                                                             "type": "string",
-                                                                            "example": "banners/image.jpg"
-                                                                        },
-                                                                        "url": {
-                                                                            "type": "string",
-                                                                            "format": "uri",
-                                                                            "example": "https://example.com/storage/banners/image.jpg"
+                                                                            "example": "banners/banner-verao-2026.jpg"
                                                                         },
                                                                         "alt": {
                                                                             "type": "string",
-                                                                            "example": "Descrição da imagem",
+                                                                            "example": "Banner de ofertas de verão",
                                                                             "nullable": true
                                                                         },
                                                                         "created_at": {
                                                                             "type": "string",
                                                                             "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                            "example": "2026-02-17T10:30:00.000000Z"
                                                                         },
                                                                         "updated_at": {
                                                                             "type": "string",
                                                                             "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                            "example": "2026-02-17T10:30:00.000000Z"
                                                                         }
                                                                     },
                                                                     "type": "object"
@@ -433,6 +432,7 @@
                                                     }
                                                 },
                                                 "categories": {
+                                                    "description": "Todas as categorias de produtos ordenadas por nome, com contador de produtos",
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
@@ -446,12 +446,12 @@
                                                             },
                                                             "description": {
                                                                 "type": "string",
-                                                                "example": "Produtos eletrônicos em geral",
+                                                                "example": "Produtos eletrônicos e tecnologia",
                                                                 "nullable": true
                                                             },
                                                             "icon": {
                                                                 "type": "string",
-                                                                "example": "icon-electronics",
+                                                                "example": "heroicon-o-device-phone-mobile",
                                                                 "nullable": true
                                                             },
                                                             "href": {
@@ -462,22 +462,24 @@
                                                             "created_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00.000000Z"
+                                                                "example": "2026-01-10T08:00:00.000000Z"
                                                             },
                                                             "updated_at": {
                                                                 "type": "string",
                                                                 "format": "date-time",
-                                                                "example": "2026-02-17T00:00:00.000000Z"
+                                                                "example": "2026-01-10T08:00:00.000000Z"
                                                             },
                                                             "products_count": {
+                                                                "description": "Quantidade de produtos nesta categoria",
                                                                 "type": "integer",
-                                                                "example": 25
+                                                                "example": 142
                                                             }
                                                         },
                                                         "type": "object"
                                                     }
                                                 },
                                                 "products": {
+                                                    "description": "Produtos em destaque (apenas produtos com estoque > 0)",
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
@@ -487,49 +489,121 @@
                                                             },
                                                             "name": {
                                                                 "type": "string",
-                                                                "example": "Smartphone XYZ"
+                                                                "example": "iPhone 15 Pro Max"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "iphone-15-pro-max"
                                                             },
                                                             "description": {
                                                                 "type": "string",
-                                                                "example": "Smartphone de última geração",
-                                                                "nullable": true
+                                                                "example": "Smartphone Apple com chip A17 Pro"
+                                                            },
+                                                            "long_description": {
+                                                                "type": "string",
+                                                                "example": "O iPhone 15 Pro Max possui tela Super Retina XDR de 6.7 polegadas..."
+                                                            },
+                                                            "brand": {
+                                                                "type": "string",
+                                                                "example": "Apple"
+                                                            },
+                                                            "sku": {
+                                                                "type": "string",
+                                                                "example": "IPHONE-15-PM-256-TIT"
                                                             },
                                                             "price": {
+                                                                "description": "Preço original do produto",
                                                                 "type": "string",
-                                                                "format": "decimal",
-                                                                "example": "1999.99"
-                                                            },
-                                                            "sale_price": {
-                                                                "type": "string",
-                                                                "format": "decimal",
-                                                                "example": "1899.99",
-                                                                "nullable": true
-                                                            },
-                                                            "has_offer": {
-                                                                "type": "boolean",
-                                                                "example": true
-                                                            },
-                                                            "discount_percentage": {
-                                                                "type": "integer",
-                                                                "example": 5,
-                                                                "nullable": true
+                                                                "example": "9999.00"
                                                             },
                                                             "badge": {
+                                                                "description": "Badge de destaque (Lançamento, Oferta, etc)",
                                                                 "type": "string",
-                                                                "example": "new",
+                                                                "example": "Lançamento",
                                                                 "nullable": true
                                                             },
                                                             "stock_quantity": {
                                                                 "type": "integer",
-                                                                "example": 50
+                                                                "example": 45
+                                                            },
+                                                            "product_category_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "colors": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                                "example": [
+                                                                    "Titânio Natural",
+                                                                    "Titânio Azul",
+                                                                    "Titânio Preto"
+                                                                ]
+                                                            },
+                                                            "specs": {
+                                                                "type": "object",
+                                                                "example": {
+                                                                    "Tela": "6.7\"",
+                                                                    "Memória": "256GB",
+                                                                    "Chip": "A17 Pro"
+                                                                }
+                                                            },
+                                                            "current_price": {
+                                                                "description": "Preço atual (com oferta se houver, senão price)",
+                                                                "type": "string",
+                                                                "example": "8999.00"
+                                                            },
+                                                            "sale_price": {
+                                                                "description": "Preço de venda (com oferta se houver, senão price)",
+                                                                "type": "string",
+                                                                "example": "8999.00"
+                                                            },
+                                                            "has_offer": {
+                                                                "description": "Indica se possui oferta ativa",
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "discount_percentage": {
+                                                                "description": "Percentual de desconto da oferta",
+                                                                "type": "integer",
+                                                                "example": 10,
+                                                                "nullable": true
+                                                            },
+                                                            "reviews_rating": {
+                                                                "description": "Média de avaliações arredondada",
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 4.7
+                                                            },
+                                                            "reviews_count": {
+                                                                "description": "Total de avaliações",
+                                                                "type": "integer",
+                                                                "example": 89
+                                                            },
+                                                            "reviews_avg_rating": {
+                                                                "description": "Média de avaliações (versão int)",
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-01-20T14:30:00.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-15T09:15:00.000000Z"
                                                             },
                                                             "images": {
+                                                                "description": "Imagens do produto",
                                                                 "type": "array",
                                                                 "items": {
                                                                     "properties": {
                                                                         "id": {
                                                                             "type": "integer",
-                                                                            "example": 1
+                                                                            "example": 10
                                                                         },
                                                                         "imageable_type": {
                                                                             "type": "string",
@@ -541,33 +615,29 @@
                                                                         },
                                                                         "path": {
                                                                             "type": "string",
-                                                                            "example": "products/image.jpg"
-                                                                        },
-                                                                        "url": {
-                                                                            "type": "string",
-                                                                            "format": "uri",
-                                                                            "example": "https://example.com/storage/products/image.jpg"
+                                                                            "example": "products/iphone-15-pro-max-titanium.jpg"
                                                                         },
                                                                         "alt": {
                                                                             "type": "string",
-                                                                            "example": "Imagem do produto",
+                                                                            "example": "iPhone 15 Pro Max cor Titânio",
                                                                             "nullable": true
                                                                         },
                                                                         "created_at": {
                                                                             "type": "string",
                                                                             "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                            "example": "2026-01-20T14:30:00.000000Z"
                                                                         },
                                                                         "updated_at": {
                                                                             "type": "string",
                                                                             "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
+                                                                            "example": "2026-01-20T14:30:00.000000Z"
                                                                         }
                                                                     },
                                                                     "type": "object"
                                                                 }
                                                             },
                                                             "category": {
+                                                                "description": "Categoria do produto (obrigatória)",
                                                                 "properties": {
                                                                     "id": {
                                                                         "type": "integer",
@@ -579,12 +649,12 @@
                                                                     },
                                                                     "description": {
                                                                         "type": "string",
-                                                                        "example": "Produtos eletrônicos",
+                                                                        "example": "Produtos eletrônicos e tecnologia",
                                                                         "nullable": true
                                                                     },
                                                                     "icon": {
                                                                         "type": "string",
-                                                                        "example": "icon-electronics",
+                                                                        "example": "heroicon-o-device-phone-mobile",
                                                                         "nullable": true
                                                                     },
                                                                     "href": {
@@ -595,231 +665,76 @@
                                                                     "created_at": {
                                                                         "type": "string",
                                                                         "format": "date-time",
-                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                        "example": "2026-01-10T08:00:00.000000Z"
                                                                     },
                                                                     "updated_at": {
                                                                         "type": "string",
                                                                         "format": "date-time",
-                                                                        "example": "2026-02-17T00:00:00.000000Z"
+                                                                        "example": "2026-01-10T08:00:00.000000Z"
                                                                     }
                                                                 },
-                                                                "type": "object",
-                                                                "nullable": true
+                                                                "type": "object"
                                                             },
-                                                            "reviews_count": {
-                                                                "type": "integer",
-                                                                "example": 15
-                                                            },
-                                                            "reviews_avg_rating": {
-                                                                "type": "number",
-                                                                "format": "float",
-                                                                "example": 4.5,
-                                                                "nullable": true
+                                                            "offers": {
+                                                                "description": "Ofertas associadas ao produto (pode estar vazio se não houver ofertas)",
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 5
+                                                                        },
+                                                                        "product_id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "offer_price": {
+                                                                            "type": "string",
+                                                                            "example": "8999.00"
+                                                                        },
+                                                                        "starts_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-15T00:00:00.000000Z",
+                                                                            "nullable": true
+                                                                        },
+                                                                        "ends_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-28T23:59:59.000000Z",
+                                                                            "nullable": true
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-14T16:00:00.000000Z"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-02-14T16:00:00.000000Z"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
                                                             }
                                                         },
                                                         "type": "object"
                                                     }
                                                 },
                                                 "offers": {
-                                                    "description": "Produtos em oferta (mesma estrutura de products)",
+                                                    "description": "Produtos com ofertas ativas no momento (mesma estrutura completa do array \"products\" acima)",
                                                     "type": "array",
                                                     "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 2
-                                                            },
-                                                            "name": {
-                                                                "type": "string",
-                                                                "example": "Tablet ABC"
-                                                            },
-                                                            "description": {
-                                                                "type": "string",
-                                                                "example": "Tablet com tecnologia avançada",
-                                                                "nullable": true
-                                                            },
-                                                            "price": {
-                                                                "type": "string",
-                                                                "format": "decimal",
-                                                                "example": "799.99"
-                                                            },
-                                                            "sale_price": {
-                                                                "type": "string",
-                                                                "format": "decimal",
-                                                                "example": "599.99"
-                                                            },
-                                                            "has_offer": {
-                                                                "type": "boolean",
-                                                                "example": true
-                                                            },
-                                                            "discount_percentage": {
-                                                                "type": "integer",
-                                                                "example": 25
-                                                            },
-                                                            "badge": {
-                                                                "type": "string",
-                                                                "example": "sale",
-                                                                "nullable": true
-                                                            },
-                                                            "stock_quantity": {
-                                                                "type": "integer",
-                                                                "example": 30
-                                                            },
-                                                            "images": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "id": {
-                                                                            "type": "integer",
-                                                                            "example": 2
-                                                                        },
-                                                                        "imageable_type": {
-                                                                            "type": "string",
-                                                                            "example": "App\\Models\\Product"
-                                                                        },
-                                                                        "imageable_id": {
-                                                                            "type": "integer",
-                                                                            "example": 2
-                                                                        },
-                                                                        "path": {
-                                                                            "type": "string",
-                                                                            "example": "products/tablet.jpg"
-                                                                        },
-                                                                        "url": {
-                                                                            "type": "string",
-                                                                            "format": "uri",
-                                                                            "example": "https://example.com/storage/products/tablet.jpg"
-                                                                        },
-                                                                        "alt": {
-                                                                            "type": "string",
-                                                                            "example": "Tablet em oferta",
-                                                                            "nullable": true
-                                                                        },
-                                                                        "created_at": {
-                                                                            "type": "string",
-                                                                            "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
-                                                                        },
-                                                                        "updated_at": {
-                                                                            "type": "string",
-                                                                            "format": "date-time",
-                                                                            "example": "2026-02-17T00:00:00.000000Z"
-                                                                        }
-                                                                    },
-                                                                    "type": "object"
-                                                                }
-                                                            },
-                                                            "category": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 1
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string",
-                                                                        "example": "Eletrônicos"
-                                                                    },
-                                                                    "description": {
-                                                                        "type": "string",
-                                                                        "example": "Produtos eletrônicos",
-                                                                        "nullable": true
-                                                                    },
-                                                                    "icon": {
-                                                                        "type": "string",
-                                                                        "example": "icon-electronics",
-                                                                        "nullable": true
-                                                                    },
-                                                                    "href": {
-                                                                        "type": "string",
-                                                                        "example": "/categorias/eletronicos",
-                                                                        "nullable": true
-                                                                    },
-                                                                    "created_at": {
-                                                                        "type": "string",
-                                                                        "format": "date-time",
-                                                                        "example": "2026-02-17T00:00:00.000000Z"
-                                                                    },
-                                                                    "updated_at": {
-                                                                        "type": "string",
-                                                                        "format": "date-time",
-                                                                        "example": "2026-02-17T00:00:00.000000Z"
-                                                                    }
-                                                                },
-                                                                "type": "object",
-                                                                "nullable": true
-                                                            },
-                                                            "reviews_count": {
-                                                                "type": "integer",
-                                                                "example": 8
-                                                            },
-                                                            "reviews_avg_rating": {
-                                                                "type": "number",
-                                                                "format": "float",
-                                                                "example": 4.2,
-                                                                "nullable": true
-                                                            }
-                                                        },
+                                                        "description": "Cada item segue a mesma estrutura dos objetos no array \"products\"",
                                                         "type": "object"
                                                     }
                                                 },
                                                 "bestsellers": {
-                                                    "description": "Produtos mais vendidos (mesma estrutura de products)",
+                                                    "description": "Produtos mais vendidos (top 8, mesma estrutura completa do array \"products\" acima)",
                                                     "type": "array",
                                                     "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 3
-                                                            },
-                                                            "name": {
-                                                                "type": "string",
-                                                                "example": "Notebook Premium"
-                                                            },
-                                                            "description": {
-                                                                "type": "string",
-                                                                "example": "Notebook potente para trabalho",
-                                                                "nullable": true
-                                                            },
-                                                            "price": {
-                                                                "type": "string",
-                                                                "format": "decimal",
-                                                                "example": "3999.99"
-                                                            },
-                                                            "sale_price": {
-                                                                "type": "string",
-                                                                "format": "decimal",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "has_offer": {
-                                                                "type": "boolean",
-                                                                "example": false
-                                                            },
-                                                            "discount_percentage": {
-                                                                "type": "integer",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "badge": {
-                                                                "type": "string",
-                                                                "example": "hot",
-                                                                "nullable": true
-                                                            },
-                                                            "stock_quantity": {
-                                                                "type": "integer",
-                                                                "example": 15
-                                                            },
-                                                            "reviews_count": {
-                                                                "type": "integer",
-                                                                "example": 42
-                                                            },
-                                                            "reviews_avg_rating": {
-                                                                "type": "number",
-                                                                "format": "float",
-                                                                "example": 4.8,
-                                                                "nullable": true
-                                                            }
-                                                        },
+                                                        "description": "Cada item segue a mesma estrutura dos objetos no array \"products\"",
                                                         "type": "object"
                                                     }
                                                 }
@@ -1005,66 +920,115 @@
                                                                     },
                                                                     "name": {
                                                                         "type": "string",
-                                                                        "example": "Notebook Dell Inspiron"
+                                                                        "example": "iPhone 15 Pro Max"
+                                                                    },
+                                                                    "slug": {
+                                                                        "type": "string",
+                                                                        "example": "iphone-15-pro-max"
                                                                     },
                                                                     "description": {
                                                                         "type": "string",
-                                                                        "example": "Notebook potente para trabalho"
+                                                                        "example": "Smartphone Apple com chip A17 Pro"
+                                                                    },
+                                                                    "long_description": {
+                                                                        "type": "string",
+                                                                        "example": "O iPhone 15 Pro Max possui tela Super Retina XDR de 6.7 polegadas..."
+                                                                    },
+                                                                    "brand": {
+                                                                        "type": "string",
+                                                                        "example": "Apple"
+                                                                    },
+                                                                    "sku": {
+                                                                        "type": "string",
+                                                                        "example": "IPHONE-15-PM-256-TIT"
                                                                     },
                                                                     "price": {
+                                                                        "description": "Preço original do produto",
                                                                         "type": "string",
-                                                                        "example": "3500.00"
+                                                                        "example": "9999.00"
                                                                     },
                                                                     "badge": {
+                                                                        "description": "Badge de destaque (Lançamento, Oferta, etc)",
                                                                         "type": "string",
                                                                         "example": "Lançamento",
                                                                         "nullable": true
                                                                     },
                                                                     "stock_quantity": {
                                                                         "type": "integer",
-                                                                        "example": 10
+                                                                        "example": 45
                                                                     },
                                                                     "product_category_id": {
                                                                         "type": "integer",
                                                                         "example": 1
                                                                     },
+                                                                    "colors": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "example": [
+                                                                            "Titânio Natural",
+                                                                            "Titânio Azul",
+                                                                            "Titânio Preto"
+                                                                        ]
+                                                                    },
+                                                                    "specs": {
+                                                                        "type": "object",
+                                                                        "example": {
+                                                                            "Tela": "6.7\"",
+                                                                            "Memória": "256GB",
+                                                                            "Chip": "A17 Pro"
+                                                                        }
+                                                                    },
                                                                     "current_price": {
+                                                                        "description": "Preço atual (com oferta se houver, senão price)",
                                                                         "type": "string",
-                                                                        "example": "2999.00"
+                                                                        "example": "8999.00"
                                                                     },
                                                                     "sale_price": {
+                                                                        "description": "Preço de venda (com oferta se houver, senão price)",
                                                                         "type": "string",
-                                                                        "example": "2999.00",
-                                                                        "nullable": true
+                                                                        "example": "8999.00"
                                                                     },
                                                                     "has_offer": {
+                                                                        "description": "Indica se possui oferta ativa",
                                                                         "type": "boolean",
                                                                         "example": true
                                                                     },
                                                                     "discount_percentage": {
+                                                                        "description": "Percentual de desconto da oferta",
                                                                         "type": "integer",
-                                                                        "example": 14,
+                                                                        "example": 10,
                                                                         "nullable": true
                                                                     },
-                                                                    "average_rating": {
+                                                                    "reviews_rating": {
+                                                                        "description": "Média de avaliações arredondada",
                                                                         "type": "number",
                                                                         "format": "float",
-                                                                        "example": 4.5,
-                                                                        "nullable": true
+                                                                        "example": 4.7
                                                                     },
                                                                     "reviews_count": {
+                                                                        "description": "Total de avaliações",
                                                                         "type": "integer",
-                                                                        "example": 25
+                                                                        "example": 89
+                                                                    },
+                                                                    "reviews_avg_rating": {
+                                                                        "description": "Média de avaliações (versão int)",
+                                                                        "type": "integer",
+                                                                        "example": 4
                                                                     },
                                                                     "created_at": {
                                                                         "type": "string",
-                                                                        "format": "date-time"
+                                                                        "format": "date-time",
+                                                                        "example": "2026-01-20T14:30:00.000000Z"
                                                                     },
                                                                     "updated_at": {
                                                                         "type": "string",
-                                                                        "format": "date-time"
+                                                                        "format": "date-time",
+                                                                        "example": "2026-02-15T09:15:00.000000Z"
                                                                     },
                                                                     "category": {
+                                                                        "description": "Categoria do produto (obrigatória)",
                                                                         "properties": {
                                                                             "id": {
                                                                                 "type": "integer",
@@ -1073,26 +1037,113 @@
                                                                             "name": {
                                                                                 "type": "string",
                                                                                 "example": "Eletrônicos"
+                                                                            },
+                                                                            "description": {
+                                                                                "type": "string",
+                                                                                "example": "Produtos eletrônicos e tecnologia",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "icon": {
+                                                                                "type": "string",
+                                                                                "example": "heroicon-o-device-phone-mobile",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "href": {
+                                                                                "type": "string",
+                                                                                "example": "/categorias/eletronicos",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "created_at": {
+                                                                                "type": "string",
+                                                                                "format": "date-time",
+                                                                                "example": "2026-01-10T08:00:00.000000Z"
+                                                                            },
+                                                                            "updated_at": {
+                                                                                "type": "string",
+                                                                                "format": "date-time",
+                                                                                "example": "2026-01-10T08:00:00.000000Z"
                                                                             }
                                                                         },
                                                                         "type": "object"
                                                                     },
                                                                     "images": {
+                                                                        "description": "Imagens do produto",
                                                                         "type": "array",
                                                                         "items": {
                                                                             "properties": {
                                                                                 "id": {
-                                                                                    "type": "integer"
+                                                                                    "type": "integer",
+                                                                                    "example": 10
+                                                                                },
+                                                                                "imageable_type": {
+                                                                                    "type": "string",
+                                                                                    "example": "App\\Models\\Product"
+                                                                                },
+                                                                                "imageable_id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 1
                                                                                 },
                                                                                 "path": {
-                                                                                    "type": "string"
-                                                                                },
-                                                                                "url": {
-                                                                                    "type": "string"
+                                                                                    "type": "string",
+                                                                                    "example": "products/iphone-15-pro-max-titanium.jpg"
                                                                                 },
                                                                                 "alt": {
                                                                                     "type": "string",
+                                                                                    "example": "iPhone 15 Pro Max cor Titânio",
                                                                                     "nullable": true
+                                                                                },
+                                                                                "created_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-01-20T14:30:00.000000Z"
+                                                                                },
+                                                                                "updated_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-01-20T14:30:00.000000Z"
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    },
+                                                                    "offers": {
+                                                                        "description": "Ofertas associadas ao produto (pode estar vazio se não houver ofertas)",
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 5
+                                                                                },
+                                                                                "product_id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "offer_price": {
+                                                                                    "type": "string",
+                                                                                    "example": "8999.00"
+                                                                                },
+                                                                                "starts_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-02-15T00:00:00.000000Z",
+                                                                                    "nullable": true
+                                                                                },
+                                                                                "ends_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-02-28T23:59:59.000000Z",
+                                                                                    "nullable": true
+                                                                                },
+                                                                                "created_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-02-14T16:00:00.000000Z"
+                                                                                },
+                                                                                "updated_at": {
+                                                                                    "type": "string",
+                                                                                    "format": "date-time",
+                                                                                    "example": "2026-02-14T16:00:00.000000Z"
                                                                                 }
                                                                             },
                                                                             "type": "object"
@@ -1169,6 +1220,347 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/products/{slug}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Obter detalhes completos de um produto pelo slug",
+                "description": "Retorna todos os dados de um produto específico incluindo imagens, categoria, ofertas e avaliações",
+                "operationId": "5bbb6d725346d38781b256ed5c715d62",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Slug único do produto",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "iphone-15-pro-max"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes completos do produto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "iPhone 15 Pro Max"
+                                        },
+                                        "slug": {
+                                            "type": "string",
+                                            "example": "iphone-15-pro-max"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Smartphone Apple com chip A17 Pro"
+                                        },
+                                        "long_description": {
+                                            "type": "string",
+                                            "example": "O iPhone 15 Pro Max possui tela Super Retina XDR de 6.7 polegadas..."
+                                        },
+                                        "brand": {
+                                            "type": "string",
+                                            "example": "Apple"
+                                        },
+                                        "sku": {
+                                            "type": "string",
+                                            "example": "IPHONE-15-PM-256-TIT"
+                                        },
+                                        "price": {
+                                            "description": "Preço original do produto",
+                                            "type": "string",
+                                            "example": "9999.00"
+                                        },
+                                        "badge": {
+                                            "description": "Badge de destaque (Lançamento, Oferta, etc)",
+                                            "type": "string",
+                                            "example": "Lançamento",
+                                            "nullable": true
+                                        },
+                                        "stock_quantity": {
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "product_category_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "colors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Titânio Natural",
+                                                "Titânio Azul",
+                                                "Titânio Preto"
+                                            ]
+                                        },
+                                        "specs": {
+                                            "type": "object",
+                                            "example": {
+                                                "Tela": "6.7\"",
+                                                "Memória": "256GB",
+                                                "Chip": "A17 Pro"
+                                            }
+                                        },
+                                        "current_price": {
+                                            "description": "Preço atual (com oferta se houver, senão price)",
+                                            "type": "string",
+                                            "example": "8999.00"
+                                        },
+                                        "sale_price": {
+                                            "description": "Preço de venda (com oferta se houver, senão price)",
+                                            "type": "string",
+                                            "example": "8999.00"
+                                        },
+                                        "has_offer": {
+                                            "description": "Indica se possui oferta ativa",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "discount_percentage": {
+                                            "description": "Percentual de desconto da oferta",
+                                            "type": "integer",
+                                            "example": 10,
+                                            "nullable": true
+                                        },
+                                        "reviews_rating": {
+                                            "description": "Média de avaliações arredondada",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.7
+                                        },
+                                        "reviews_count": {
+                                            "description": "Total de avaliações",
+                                            "type": "integer",
+                                            "example": 89
+                                        },
+                                        "reviews_avg_rating": {
+                                            "description": "Média de avaliações (versão int)",
+                                            "type": "integer",
+                                            "example": 4
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-01-20T14:30:00.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2026-02-15T09:15:00.000000Z"
+                                        },
+                                        "category": {
+                                            "description": "Categoria do produto (obrigatória)",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Eletrônicos"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Produtos eletrônicos e tecnologia",
+                                                    "nullable": true
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "example": "heroicon-o-device-phone-mobile",
+                                                    "nullable": true
+                                                },
+                                                "href": {
+                                                    "type": "string",
+                                                    "example": "/categorias/eletronicos",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-01-10T08:00:00.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-01-10T08:00:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "images": {
+                                            "description": "Imagens do produto",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "imageable_type": {
+                                                        "type": "string",
+                                                        "example": "App\\Models\\Product"
+                                                    },
+                                                    "imageable_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "path": {
+                                                        "type": "string",
+                                                        "example": "products/iphone-15-pro-max-titanium.jpg"
+                                                    },
+                                                    "alt": {
+                                                        "type": "string",
+                                                        "example": "iPhone 15 Pro Max cor Titânio",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-01-20T14:30:00.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-01-20T14:30:00.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "offers": {
+                                            "description": "Ofertas associadas ao produto",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "product_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "offer_price": {
+                                                        "type": "string",
+                                                        "example": "8999.00"
+                                                    },
+                                                    "starts_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-15T00:00:00.000000Z",
+                                                        "nullable": true
+                                                    },
+                                                    "ends_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-28T23:59:59.000000Z",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-14T16:00:00.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-14T16:00:00.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "reviews": {
+                                            "description": "Avaliações do produto com informações do usuário",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 15
+                                                    },
+                                                    "product_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 42
+                                                    },
+                                                    "rating": {
+                                                        "description": "Nota de 1 a 5",
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Excelente produto!"
+                                                    },
+                                                    "comment": {
+                                                        "type": "string",
+                                                        "example": "Superou todas as expectativas, recomendo!"
+                                                    },
+                                                    "verified": {
+                                                        "description": "Indica se a compra foi verificada",
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T16:45:00.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T16:45:00.000000Z"
+                                                    },
+                                                    "user": {
+                                                        "description": "Dados do usuário que fez a avaliação",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 42
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "João Silva"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "joao@example.com"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Produto não encontrado"
                     }
                 }
             }

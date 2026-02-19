@@ -46,34 +46,46 @@ class FilterProductsAction
      */
     protected function applyPriceRange(Builder $query, ?float $priceMin, ?float $priceMax): void
     {
-        // if ($priceMin !== null) {
-        //     // Considera o preço original do produto
-        //     $query->where(column: function (Builder $query) use ($priceMin): void {
-        //         // Produtos sem oferta
-        //         $query->where(column: function (Builder $q) use ($priceMin): void {
-        //             $q->whereDoesntHave(relation: 'offers', callback: fn(Builder $q): mixed => $q->active())
-        //                 ->where(column: 'price', operator: '>=', value: $priceMin);
-        //         })
-        //             // Produtos com oferta
-        //             ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMin): void {
-        //                 $q->active()->where('offer_price', '>=', $priceMin);
-        //             });
-        //     });
-        // }
+        if ($priceMin !== null) {
+            // Considera o preço original do produto
+            $query->where(function (Builder $query) use ($priceMin): void {
+                // Produtos sem oferta
+                $query->where(function (Builder $q) use ($priceMin): void {
+                    $q->whereDoesntHave(relation: 'offers', callback: function (Builder $q): void {
+                        /** @var Builder $q */
+                        $q->active();
+                    })
+                        ->where(column: 'price', operator: '>=', value: $priceMin);
+                })
+                    // Produtos com oferta
+                    ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMin): void {
+                        /** @var Builder $q */
+                        /** @var Builder $activeOffers */
+                        $activeOffers = $q->active();
+                        $activeOffers->where('offer_price', '>=', $priceMin);
+                    });
+            });
+        }
 
-        // if ($priceMax !== null) {
-        //     $query->where(column: function (Builder $query) use ($priceMax): void {
-        //         // Produtos sem oferta
-        //         $query->where(column: function (Builder $q) use ($priceMax): void {
-        //             $q->whereDoesntHave(relation: 'offers', callback: fn(Builder $q): mixed => $q->active())
-        //                 ->where(column: 'price', operator: '<=', value: $priceMax);
-        //         })
-        //             // Produtos com oferta
-        //             ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMax): void {
-        //                 $q->active()->where('offer_price', '<=', $priceMax);
-        //             });
-        //     });
-        // }
+        if ($priceMax !== null) {
+            $query->where(function (Builder $query) use ($priceMax): void {
+                // Produtos sem oferta
+                $query->where(function (Builder $q) use ($priceMax): void {
+                    $q->whereDoesntHave(relation: 'offers', callback: function (Builder $q): void {
+                        /** @var Builder $q */
+                        $q->active();
+                    })
+                        ->where(column: 'price', operator: '<=', value: $priceMax);
+                })
+                    // Produtos com oferta
+                    ->orWhereHas(relation: 'offers', callback: function (Builder $q) use ($priceMax): void {
+                        /** @var Builder $q */
+                        /** @var Builder $activeOffers */
+                        $activeOffers = $q->active();
+                        $activeOffers->where('offer_price', '<=', $priceMax);
+                    });
+            });
+        }
     }
 
     /**
@@ -87,11 +99,11 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereHas(relation: 'reviews', callback: function (Builder $query) use ($ratings): void {
-            $query->selectRaw(expression: 'product_id, AVG(rating) as avg_rating')
-                ->groupBy(groups: 'product_id')
-                ->havingRaw(sql: 'FLOOR(AVG(rating)) IN (' . implode(separator: ',', array: $ratings) . ')');
-        });
+        $ratingsPlaceholders = implode(separator: ',', array: $ratings);
+
+        $query->whereRaw(
+            sql: "FLOOR(COALESCE((SELECT AVG(rating) FROM product_reviews WHERE product_reviews.product_id = products.id), 0)) IN ({$ratingsPlaceholders})"
+        );
     }
 
     /**
@@ -103,7 +115,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereHas(relation: 'offers', callback: fn(Builder $query): mixed => $query->active());
+        $query->whereHas(relation: 'offers', callback: fn (Builder $query): mixed => $query->active());
     }
 
     /**
@@ -150,24 +162,16 @@ class FilterProductsAction
     protected function sortByBiggestDiscount(Builder $query): void
     {
         // Produtos com ofertas ativas primeiro, ordenados por % de desconto
-        $query->leftJoin(table: 'product_offers', first: function ($join): void {
-            $join->on('products.id', '=', 'product_offers.product_id')
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.starts_at')
-                        ->orWhere('product_offers.starts_at', '<=', now());
-                })
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.ends_at')
-                        ->orWhere('product_offers.ends_at', '>=', now());
-                });
-        })
-            ->selectRaw(expression: 'products.*, 
-                CASE 
-                    WHEN product_offers.offer_price IS NOT NULL 
-                    THEN ((products.price - product_offers.offer_price) / products.price * 100) 
+        $query->orderByRaw(sql: 'CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM product_offers 
+                        WHERE product_offers.product_id = products.id 
+                        AND product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()
+                        AND product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()
+                    ) 
+                    THEN ((products.price - (SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id LIMIT 1)) / products.price * 100) 
                     ELSE 0 
-                END as discount_percentage')
-            ->orderBy(column: 'discount_percentage', direction: 'desc')
+                END DESC')
             ->orderBy(column: 'products.created_at', direction: 'desc');
     }
 
@@ -195,20 +199,7 @@ class FilterProductsAction
      */
     protected function sortByHighestPrice(Builder $query): void
     {
-        $query->leftJoin(table: 'product_offers', first: function ($join): void {
-            $join->on('products.id', '=', 'product_offers.product_id')
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.starts_at')
-                        ->orWhere('product_offers.starts_at', '<=', now());
-                })
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.ends_at')
-                        ->orWhere('product_offers.ends_at', '>=', now());
-                });
-        })
-            ->selectRaw(expression: 'products.*, 
-                COALESCE(product_offers.offer_price, products.price) as current_price')
-            ->orderBy(column: 'current_price', direction: 'desc');
+        $query->orderByRaw(sql: 'COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()) LIMIT 1), products.price) DESC');
     }
 
     /**
@@ -216,20 +207,7 @@ class FilterProductsAction
      */
     protected function sortByLowestPrice(Builder $query): void
     {
-        $query->leftJoin(table: 'product_offers', first: function ($join): void {
-            $join->on('products.id', '=', 'product_offers.product_id')
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.starts_at')
-                        ->orWhere('product_offers.starts_at', '<=', now());
-                })
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.ends_at')
-                        ->orWhere('product_offers.ends_at', '>=', now());
-                });
-        })
-            ->selectRaw(expression: 'products.*, 
-                COALESCE(product_offers.offer_price, products.price) as current_price')
-            ->orderBy(column: 'current_price', direction: 'asc');
+        $query->orderByRaw(sql: 'COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()) LIMIT 1), products.price) ASC');
     }
 
     /**
@@ -239,20 +217,7 @@ class FilterProductsAction
      */
     protected function sortByMostRelevant(Builder $query): void
     {
-        $query->leftJoin(table: 'product_offers', first: function ($join): void {
-            $join->on('products.id', '=', 'product_offers.product_id')
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.starts_at')
-                        ->orWhere('product_offers.starts_at', '<=', now());
-                })
-                ->where(function ($query): void {
-                    $query->whereNull('product_offers.ends_at')
-                        ->orWhere('product_offers.ends_at', '>=', now());
-                });
-        })
-            ->selectRaw(expression: 'products.*, 
-                (CASE WHEN product_offers.id IS NOT NULL THEN 1 ELSE 0 END) as has_active_offer')
-            ->orderBy(column: 'has_active_offer', direction: 'desc')
+        $query->orderByRaw(sql: 'CASE WHEN EXISTS (SELECT 1 FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW())) THEN 1 ELSE 0 END DESC')
             ->orderBy(column: 'reviews_avg_rating', direction: 'desc')
             ->orderBy(column: 'reviews_count', direction: 'desc')
             ->orderBy(column: 'products.created_at', direction: 'desc');
@@ -281,7 +246,7 @@ class FilterProductsAction
                 relations: [
                     'category:id,name',
                     'images',
-                    'offers' => fn(HasMany $query): mixed => $query->active(),
+                    'offers' => fn (HasMany $query): mixed => $query->active(),
                 ]
             )
             ->withCount(relations: 'reviews')
@@ -309,7 +274,9 @@ class FilterProductsAction
 
                 return $image;
             });
-            $product->reviews_avg_rating = $product->reviews_avg_rating ? round(num: $product->reviews_avg_rating, precision: 1) : null;
+            /** @var float|int|null $rating */
+            $rating = $product->reviews_avg_rating;
+            $product->reviews_avg_rating = $rating ? round(num: $rating, precision: 1) : null;
 
             return $product;
         });

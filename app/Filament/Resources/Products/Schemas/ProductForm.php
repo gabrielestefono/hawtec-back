@@ -62,7 +62,8 @@ class ProductForm
                                     ->toArray()
                             )
                             ->searchable()
-                            ->nullable(),
+                            ->required()
+                            ->native(false),
                     ])
                     ->columns(columns: 1),
             ])->columns(columns: 1);

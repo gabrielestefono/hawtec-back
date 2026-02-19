@@ -120,38 +120,73 @@ class ProductController extends Controller
                                             items: new OA\Items(
                                                 properties: [
                                                     new OA\Property(property: 'id', type: 'integer', example: 1),
-                                                    new OA\Property(property: 'name', type: 'string', example: 'Notebook Dell Inspiron'),
-                                                    new OA\Property(property: 'description', type: 'string', example: 'Notebook potente para trabalho'),
-                                                    new OA\Property(property: 'price', type: 'string', example: '3500.00'),
-                                                    new OA\Property(property: 'badge', type: 'string', nullable: true, example: 'Lançamento'),
-                                                    new OA\Property(property: 'stock_quantity', type: 'integer', example: 10),
+                                                    new OA\Property(property: 'name', type: 'string', example: 'iPhone 15 Pro Max'),
+                                                    new OA\Property(property: 'slug', type: 'string', example: 'iphone-15-pro-max'),
+                                                    new OA\Property(property: 'description', type: 'string', example: 'Smartphone Apple com chip A17 Pro'),
+                                                    new OA\Property(property: 'long_description', type: 'string', example: 'O iPhone 15 Pro Max possui tela Super Retina XDR de 6.7 polegadas...'),
+                                                    new OA\Property(property: 'brand', type: 'string', example: 'Apple'),
+                                                    new OA\Property(property: 'sku', type: 'string', example: 'IPHONE-15-PM-256-TIT'),
+                                                    new OA\Property(property: 'price', type: 'string', example: '9999.00', description: 'Preço original do produto'),
+                                                    new OA\Property(property: 'badge', type: 'string', nullable: true, example: 'Lançamento', description: 'Badge de destaque (Lançamento, Oferta, etc)'),
+                                                    new OA\Property(property: 'stock_quantity', type: 'integer', example: 45),
                                                     new OA\Property(property: 'product_category_id', type: 'integer', example: 1),
-                                                    new OA\Property(property: 'current_price', type: 'string', example: '2999.00'),
-                                                    new OA\Property(property: 'sale_price', type: 'string', nullable: true, example: '2999.00'),
-                                                    new OA\Property(property: 'has_offer', type: 'boolean', example: true),
-                                                    new OA\Property(property: 'discount_percentage', type: 'integer', nullable: true, example: 14),
-                                                    new OA\Property(property: 'average_rating', type: 'number', format: 'float', nullable: true, example: 4.5),
-                                                    new OA\Property(property: 'reviews_count', type: 'integer', example: 25),
-                                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
-                                                    new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+                                                    new OA\Property(property: 'colors', type: 'array', items: new OA\Items(type: 'string'), example: ['Titânio Natural', 'Titânio Azul', 'Titânio Preto']),
+                                                    new OA\Property(property: 'specs', type: 'object', example: ['Tela' => '6.7"', 'Memória' => '256GB', 'Chip' => 'A17 Pro']),
+                                                    new OA\Property(property: 'current_price', type: 'string', example: '8999.00', description: 'Preço atual (com oferta se houver, senão price)'),
+                                                    new OA\Property(property: 'sale_price', type: 'string', example: '8999.00', description: 'Preço de venda (com oferta se houver, senão price)'),
+                                                    new OA\Property(property: 'has_offer', type: 'boolean', example: true, description: 'Indica se possui oferta ativa'),
+                                                    new OA\Property(property: 'discount_percentage', type: 'integer', nullable: true, example: 10, description: 'Percentual de desconto da oferta'),
+                                                    new OA\Property(property: 'reviews_rating', type: 'number', format: 'float', example: 4.7, description: 'Média de avaliações arredondada'),
+                                                    new OA\Property(property: 'reviews_count', type: 'integer', example: 89, description: 'Total de avaliações'),
+                                                    new OA\Property(property: 'reviews_avg_rating', type: 'integer', example: 4, description: 'Média de avaliações (versão int)'),
+                                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                                                    new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-15T09:15:00.000000Z'),
                                                     new OA\Property(
                                                         property: 'category',
+                                                        description: 'Categoria do produto (obrigatória)',
                                                         type: 'object',
                                                         properties: [
                                                             new OA\Property(property: 'id', type: 'integer', example: 1),
                                                             new OA\Property(property: 'name', type: 'string', example: 'Eletrônicos'),
+                                                            new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Produtos eletrônicos e tecnologia'),
+                                                            new OA\Property(property: 'icon', type: 'string', nullable: true, example: 'heroicon-o-device-phone-mobile'),
+                                                            new OA\Property(property: 'href', type: 'string', nullable: true, example: '/categorias/eletronicos'),
+                                                            new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-10T08:00:00.000000Z'),
+                                                            new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-01-10T08:00:00.000000Z'),
                                                         ]
                                                     ),
                                                     new OA\Property(
                                                         property: 'images',
+                                                        description: 'Imagens do produto',
                                                         type: 'array',
                                                         items: new OA\Items(
                                                             properties: [
-                                                                new OA\Property(property: 'id', type: 'integer'),
-                                                                new OA\Property(property: 'path', type: 'string'),
-                                                                new OA\Property(property: 'url', type: 'string'),
-                                                                new OA\Property(property: 'alt', type: 'string', nullable: true),
-                                                            ]
+                                                                new OA\Property(property: 'id', type: 'integer', example: 10),
+                                                                new OA\Property(property: 'imageable_type', type: 'string', example: 'App\\Models\\Product'),
+                                                                new OA\Property(property: 'imageable_id', type: 'integer', example: 1),
+                                                                new OA\Property(property: 'path', type: 'string', example: 'products/iphone-15-pro-max-titanium.jpg'),
+                                                                new OA\Property(property: 'alt', type: 'string', nullable: true, example: 'iPhone 15 Pro Max cor Titânio'),
+                                                                new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                                                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                                                            ],
+                                                            type: 'object'
+                                                        )
+                                                    ),
+                                                    new OA\Property(
+                                                        property: 'offers',
+                                                        description: 'Ofertas associadas ao produto (pode estar vazio se não houver ofertas)',
+                                                        type: 'array',
+                                                        items: new OA\Items(
+                                                            properties: [
+                                                                new OA\Property(property: 'id', type: 'integer', example: 5),
+                                                                new OA\Property(property: 'product_id', type: 'integer', example: 1),
+                                                                new OA\Property(property: 'offer_price', type: 'string', example: '8999.00'),
+                                                                new OA\Property(property: 'starts_at', type: 'string', format: 'date-time', nullable: true, example: '2026-02-15T00:00:00.000000Z'),
+                                                                new OA\Property(property: 'ends_at', type: 'string', format: 'date-time', nullable: true, example: '2026-02-28T23:59:59.000000Z'),
+                                                                new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-02-14T16:00:00.000000Z'),
+                                                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-14T16:00:00.000000Z'),
+                                                            ],
+                                                            type: 'object'
                                                         )
                                                     ),
                                                 ],
@@ -199,42 +234,122 @@ class ProductController extends Controller
     #[OA\Get(
         path: '/api/products/{slug}',
         tags: ['Products'],
-        summary: 'Obter detalhes de um produto pelo slug',
+        summary: 'Obter detalhes completos de um produto pelo slug',
+        description: 'Retorna todos os dados de um produto específico incluindo imagens, categoria, ofertas e avaliações',
         parameters: [
             new OA\Parameter(
                 name: 'slug',
                 in: 'path',
                 description: 'Slug único do produto',
                 required: true,
-                schema: new OA\Schema(type: 'string', example: 'hawtec-pro-x1')
+                schema: new OA\Schema(type: 'string', example: 'iphone-15-pro-max')
             ),
         ],
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'Detalhes do produto',
+                description: 'Detalhes completos do produto',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'slug', type: 'string'),
-                        new OA\Property(property: 'name', type: 'string'),
-                        new OA\Property(property: 'description', type: 'string'),
-                        new OA\Property(property: 'longDescription', type: 'string'),
-                        new OA\Property(property: 'price', type: 'number', format: 'float'),
-                        new OA\Property(property: 'originalPrice', type: 'number', format: 'float'),
-                        new OA\Property(property: 'discountPercent', type: 'integer', nullable: true),
-                        new OA\Property(property: 'images', type: 'array', items: new OA\Items(type: 'string')),
-                        new OA\Property(property: 'rating', type: 'number', format: 'float'),
-                        new OA\Property(property: 'reviewCount', type: 'integer'),
-                        new OA\Property(property: 'badge', type: 'string', nullable: true),
-                        new OA\Property(property: 'category', type: 'string'),
-                        new OA\Property(property: 'brand', type: 'string'),
-                        new OA\Property(property: 'sku', type: 'string'),
-                        new OA\Property(property: 'inStock', type: 'boolean'),
-                        new OA\Property(property: 'stockCount', type: 'integer'),
-                        new OA\Property(property: 'colors', type: 'array'),
-                        new OA\Property(property: 'specs', type: 'array'),
-                        new OA\Property(property: 'reviews', type: 'array'),
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'name', type: 'string', example: 'iPhone 15 Pro Max'),
+                        new OA\Property(property: 'slug', type: 'string', example: 'iphone-15-pro-max'),
+                        new OA\Property(property: 'description', type: 'string', example: 'Smartphone Apple com chip A17 Pro'),
+                        new OA\Property(property: 'long_description', type: 'string', example: 'O iPhone 15 Pro Max possui tela Super Retina XDR de 6.7 polegadas...'),
+                        new OA\Property(property: 'brand', type: 'string', example: 'Apple'),
+                        new OA\Property(property: 'sku', type: 'string', example: 'IPHONE-15-PM-256-TIT'),
+                        new OA\Property(property: 'price', type: 'string', example: '9999.00', description: 'Preço original do produto'),
+                        new OA\Property(property: 'badge', type: 'string', nullable: true, example: 'Lançamento', description: 'Badge de destaque (Lançamento, Oferta, etc)'),
+                        new OA\Property(property: 'stock_quantity', type: 'integer', example: 45),
+                        new OA\Property(property: 'product_category_id', type: 'integer', example: 1),
+                        new OA\Property(property: 'colors', type: 'array', items: new OA\Items(type: 'string'), example: ['Titânio Natural', 'Titânio Azul', 'Titânio Preto']),
+                        new OA\Property(property: 'specs', type: 'object', example: ['Tela' => '6.7"', 'Memória' => '256GB', 'Chip' => 'A17 Pro']),
+                        new OA\Property(property: 'current_price', type: 'string', example: '8999.00', description: 'Preço atual (com oferta se houver, senão price)'),
+                        new OA\Property(property: 'sale_price', type: 'string', example: '8999.00', description: 'Preço de venda (com oferta se houver, senão price)'),
+                        new OA\Property(property: 'has_offer', type: 'boolean', example: true, description: 'Indica se possui oferta ativa'),
+                        new OA\Property(property: 'discount_percentage', type: 'integer', nullable: true, example: 10, description: 'Percentual de desconto da oferta'),
+                        new OA\Property(property: 'reviews_rating', type: 'number', format: 'float', example: 4.7, description: 'Média de avaliações arredondada'),
+                        new OA\Property(property: 'reviews_count', type: 'integer', example: 89, description: 'Total de avaliações'),
+                        new OA\Property(property: 'reviews_avg_rating', type: 'integer', example: 4, description: 'Média de avaliações (versão int)'),
+                        new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-15T09:15:00.000000Z'),
+                        new OA\Property(
+                            property: 'category',
+                            description: 'Categoria do produto (obrigatória)',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'name', type: 'string', example: 'Eletrônicos'),
+                                new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Produtos eletrônicos e tecnologia'),
+                                new OA\Property(property: 'icon', type: 'string', nullable: true, example: 'heroicon-o-device-phone-mobile'),
+                                new OA\Property(property: 'href', type: 'string', nullable: true, example: '/categorias/eletronicos'),
+                                new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-10T08:00:00.000000Z'),
+                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-01-10T08:00:00.000000Z'),
+                            ]
+                        ),
+                        new OA\Property(
+                            property: 'images',
+                            description: 'Imagens do produto',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 10),
+                                    new OA\Property(property: 'imageable_type', type: 'string', example: 'App\\Models\\Product'),
+                                    new OA\Property(property: 'imageable_id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'path', type: 'string', example: 'products/iphone-15-pro-max-titanium.jpg'),
+                                    new OA\Property(property: 'alt', type: 'string', nullable: true, example: 'iPhone 15 Pro Max cor Titânio'),
+                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                                    new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-01-20T14:30:00.000000Z'),
+                                ],
+                                type: 'object'
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'offers',
+                            description: 'Ofertas associadas ao produto',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 5),
+                                    new OA\Property(property: 'product_id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'offer_price', type: 'string', example: '8999.00'),
+                                    new OA\Property(property: 'starts_at', type: 'string', format: 'date-time', nullable: true, example: '2026-02-15T00:00:00.000000Z'),
+                                    new OA\Property(property: 'ends_at', type: 'string', format: 'date-time', nullable: true, example: '2026-02-28T23:59:59.000000Z'),
+                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-02-14T16:00:00.000000Z'),
+                                    new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-14T16:00:00.000000Z'),
+                                ],
+                                type: 'object'
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'reviews',
+                            description: 'Avaliações do produto com informações do usuário',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 15),
+                                    new OA\Property(property: 'product_id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'user_id', type: 'integer', example: 42),
+                                    new OA\Property(property: 'rating', type: 'integer', example: 5, description: 'Nota de 1 a 5'),
+                                    new OA\Property(property: 'title', type: 'string', example: 'Excelente produto!'),
+                                    new OA\Property(property: 'comment', type: 'string', example: 'Superou todas as expectativas, recomendo!'),
+                                    new OA\Property(property: 'verified', type: 'boolean', example: true, description: 'Indica se a compra foi verificada'),
+                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-02-10T16:45:00.000000Z'),
+                                    new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-10T16:45:00.000000Z'),
+                                    new OA\Property(
+                                        property: 'user',
+                                        description: 'Dados do usuário que fez a avaliação',
+                                        type: 'object',
+                                        properties: [
+                                            new OA\Property(property: 'id', type: 'integer', example: 42),
+                                            new OA\Property(property: 'name', type: 'string', example: 'João Silva'),
+                                            new OA\Property(property: 'email', type: 'string', example: 'joao@example.com'),
+                                        ]
+                                    ),
+                                ],
+                                type: 'object'
+                            )
+                        ),
                     ]
                 )
             ),
