@@ -2,27 +2,91 @@
 
 namespace App\Actions\Landing;
 
-use App\Helpers\ProductHelper;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\ProductBadge;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 class ProductAction
 {
     public function handle(): Collection
     {
-        $products = Product::query()
-            ->whereHas(relation: 'variants', callback: fn (Builder $query): Builder => $query->where(column: 'stock_quantity', operator: '>', value: 0))
-            ->with(relations: ['images', 'variants' => fn (Builder $query): Builder => $query->with(['offers' => fn (Builder $query): Builder => $query->active()]), 'category'])
-            ->withCount(relations: 'reviews')
-            ->withAvg(relation: 'reviews', column: 'rating')
-            ->get();
+        return Product::query()
+            ->with(
+                relations: [
+                    'images',
+                    'variants' => function (HasMany $query): void {
+                        $query->with(relations: ['offers']);
+                    },
+                    'category',
+                    'badges',
+                ]
+            )
+            ->get()
+            ->map(
+                callback: function (Product $product): Product {
+                    $primaryImage = $product->images()
+                        ->where(column: 'is_primary', operator: true)
+                        ->first()
+                        ?? $product->images()->first();
 
-        return $products->map(callback: function (Product $product): Product {
-            $product->reviews_rating = ProductHelper::getReviewAverageRating(product: $product);
-            $product->reviews_avg_rating = (int) $product->reviews_avg_rating;
+                    $product->setRelation(relation: 'image', value: $primaryImage);
+                    unset($product->images);
 
-            return $product;
-        });
+                    // Pegar apenas a primeira oferta ativa de cada variante
+                    $hasActiveOffer = false;
+                    foreach ($product->variants as $variant) {
+                        /**
+                         * @var HasMany $offers
+                         */
+                        $offers = $variant->offers();
+                        $firstActiveOffer = $offers->first();
+                        $variant->setRelation(relation: 'offer', value: $firstActiveOffer);
+                        unset($variant->offers);
+
+                        if ($firstActiveOffer) {
+                            $hasActiveOffer = true;
+                        }
+                    }
+
+                    // Lógica de badge
+                    if ($hasActiveOffer) {
+                        // Criar badge de desconto dinamicamente
+                        $discountBadge = new ProductBadge(
+                            attributes: [
+                                'product_id' => $product->id,
+                                'badge_type' => 'discount',
+                                'valid_from' => null,
+                                'valid_until' => null,
+                            ]
+                        );
+                        $product->setRelation(relation: 'badge', value: $discountBadge);
+                    } else {
+                        // Buscar primeira badge ativa
+                        $activeBadge = $product->badges()
+                            ->where(
+                                column: function (HasMany $query): void {
+                                    $query
+                                        ->whereNull(columns: 'valid_from')
+                                        ->orWhere(column: 'valid_from', operator: '<=', value: now());
+                                }
+                            )
+                            ->where(
+                                column: function (HasMany $query): void {
+                                    $query
+                                        ->whereNull(columns: 'valid_until')
+                                        ->orWhere(column: 'valid_until', operator: '>=', value: now());
+                                }
+                            )
+                            ->first();
+
+                        $product->setRelation(relation: 'badge', value: $activeBadge);
+                    }
+
+                    unset($product->badges);
+
+                    return $product;
+                }
+            );
     }
 }

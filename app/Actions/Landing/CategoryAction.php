@@ -11,7 +11,6 @@ class CategoryAction
     {
         return ProductCategory::query()
             ->withCount(relations: 'products')
-            ->orderBy(column: 'name')
             ->get();
     }
 }

@@ -4,7 +4,7 @@ namespace App\Actions\Landing;
 
 use App\Models\Banner;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class BannerAction
 {
@@ -12,7 +12,7 @@ class BannerAction
     {
         $now = now();
 
-        return Banner::query()
+        $banners = Banner::query()
             ->where(column: 'is_active', operator: '=', value: true)
             ->where(column: function (Builder $query) use ($now): void {
                 $query->whereNull(columns: 'starts_at')
@@ -25,5 +25,20 @@ class BannerAction
             ->orderBy(column: 'sort')
             ->with(relations: 'images')
             ->get();
+
+        return $banners->filter(function (Banner $banner) {
+            return $banner->images()->exists();
+        })->map(function (Banner $banner) {
+            $primaryImage = $banner->images()
+                ->where(column: 'is_primary', operator: true)
+                ->latest(column: 'updated_at')
+                ->first()
+                ?? $banner->images()->latest(column: 'updated_at')->first();
+
+            $banner->setRelation(relation: 'image', value: $primaryImage);
+            unset($banner->images);
+
+            return $banner;
+        })->values();
     }
 }

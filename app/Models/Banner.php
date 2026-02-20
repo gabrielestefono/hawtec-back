@@ -53,4 +53,10 @@ class Banner extends Model
     {
         return $this->morphMany(related: Image::class, name: 'imageable');
     }
+
+    public function primaryImage()
+    {
+        return $this->images()->where(column: 'is_primary', operator: true)->latest(column: 'updated_at')->first()
+            ?? $this->images()->latest(column: 'updated_at')->first();
+    }
 }
