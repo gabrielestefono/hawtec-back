@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductVariantResource\Pages\CreateProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariant;
 use App\Filament\Resources\ProductVariantResource\Pages\ListProductVariants;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\OffersRelationManager;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\SpecsRelationManager;
 use App\Models\ProductVariant;
 use BackedEnum;
@@ -133,6 +134,7 @@ class ProductVariantResource extends Resource
         return [
             OffersRelationManager::class,
             SpecsRelationManager::class,
+            ReviewsRelationManager::class,
         ];
     }
 }

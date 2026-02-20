@@ -12,6 +12,8 @@ class ProductAction
     {
         return ProductVariant::query()
             ->with(['product', 'product.images', 'product.badges', 'offers'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->limit(8)
             ->get()
             ->map(function (ProductVariant $variant): ProductVariant {
@@ -91,6 +93,10 @@ class ProductAction
                 }
 
                 $variant->badge = $badge;
+
+                $variant->reviews_avg_rating = $variant->reviews_avg_rating
+                    ? (int) round($variant->reviews_avg_rating)
+                    : null;
 
                 return $variant;
             });

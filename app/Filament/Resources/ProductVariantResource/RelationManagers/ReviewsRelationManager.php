@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Products\RelationManagers;
+namespace App\Filament\Resources\ProductVariantResource\RelationManagers;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -27,11 +27,6 @@ class ReviewsRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make(name: 'product_variant_id')
-                    ->label(label: 'Variante')
-                    ->relationship(name: 'variant', titleAttribute: 'variant_label')
-                    ->searchable()
-                    ->preload(),
                 TextInput::make(name: 'rating')
                     ->label(label: 'Nota')
                     ->required()
@@ -39,6 +34,9 @@ class ReviewsRelationManager extends RelationManager
                     ->integer()
                     ->minValue(value: 1)
                     ->maxValue(value: 5),
+                TextInput::make(name: 'title')
+                    ->label(label: 'Titulo')
+                    ->maxLength(length: 255),
                 Textarea::make(name: 'comment')
                     ->label(label: 'Comentario')
                     ->rows(rows: 3),
@@ -53,16 +51,13 @@ class ReviewsRelationManager extends RelationManager
                 TextColumn::make(name: 'user.name')
                     ->label(label: 'Cliente')
                     ->searchable(),
-                TextColumn::make(name: 'variant.variant_label')
-                    ->label(label: 'Variante')
-                    ->searchable(),
                 TextColumn::make(name: 'title')
                     ->label(label: 'Titulo')
                     ->searchable(),
                 TextColumn::make(name: 'rating')
                     ->label(label: 'Nota')
                     ->badge()
-                    ->color(state: fn (int $state): string => match ($state) {
+                    ->color(color: fn (int $state): string => match ($state) {
                         1, 2 => 'danger',
                         3 => 'warning',
                         4, 5 => 'success',
@@ -71,8 +66,8 @@ class ReviewsRelationManager extends RelationManager
                 TextColumn::make(name: 'verified')
                     ->label(label: 'Verificada')
                     ->badge()
-                    ->color(state: fn (bool $state): string => $state ? 'success' : 'gray')
-                    ->formatStateUsing(state: fn (bool $state): string => $state ? 'Sim' : 'Nao')
+                    ->color(color: fn (bool $state): string => $state ? 'success' : 'gray')
+                    ->formatStateUsing(callback: fn (bool $state): string => $state ? 'Sim' : 'Nao')
                     ->sortable(),
                 TextColumn::make(name: 'created_at')
                     ->label(label: 'Data')

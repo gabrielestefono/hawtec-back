@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $product_id
  * @property int $user_id
+ * @property int|null $product_variant_id
  * @property int $rating
  * @property string $title
  * @property string $comment
@@ -26,6 +27,7 @@ class ProductReview extends Model
     protected $fillable = [
         'product_id',
         'user_id',
+        'product_variant_id',
         'rating',
         'title',
         'comment',
@@ -48,5 +50,10 @@ class ProductReview extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 }

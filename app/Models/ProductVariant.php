@@ -97,4 +97,9 @@ class ProductVariant extends Model
     {
         return $this->hasMany(related: ProductOffer::class, foreignKey: 'product_variant_id');
     }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(related: ProductReview::class, foreignKey: 'product_variant_id');
+    }
 }
