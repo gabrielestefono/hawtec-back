@@ -15,18 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->string('sku')->unique();
-            $table->foreignId('color_id')->nullable()->constrained('product_colors')->nullOnDelete();
-            $table->foreignId('storage_id')->nullable()->constrained('storage_options')->nullOnDelete();
-            $table->foreignId('ram_id')->nullable()->constrained('ram_options')->nullOnDelete();
-            $table->enum('voltage', ['110v', '220v', '110/220v'])->nullable();
             $table->decimal('price', 10, 2);
             $table->integer('stock_quantity');
             $table->timestamps();
 
             $table->index('product_id');
-            $table->index('color_id');
-            $table->index('storage_id');
-            $table->index('ram_id');
         });
     }
 

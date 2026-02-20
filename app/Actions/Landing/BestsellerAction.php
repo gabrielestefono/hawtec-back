@@ -3,9 +3,9 @@
 namespace App\Actions\Landing;
 
 use App\Enums\OrderStatus;
-use App\Helpers\ImageHelper;
 use App\Helpers\ProductHelper;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -28,14 +28,15 @@ class BestsellerAction
 
         $products = Product::query()
             ->whereIn(column: 'id', values: $productIds)
-            ->with(relations: ['images', 'offers', 'category'])
+            ->with(relations: ['images', 'variants' => fn (Builder $query): Builder => $query->with(['offers' => fn (Builder $query): Builder => $query->active()]), 'category'])
             ->withCount(relations: 'reviews')
             ->withAvg(relation: 'reviews', column: 'rating')
             ->get()
-            ->sortBy(callback: fn(Product $product): string|int|false => $productIds->search(value: $product->id));
+            ->sortBy(callback: fn (Product $product): string|int|false => $productIds->search(value: $product->id));
 
         return $products->map(callback: function (Product $product): Product {
             $product->reviews_rating = ProductHelper::getReviewAverageRating(product: $product);
+
             return $product;
         });
     }

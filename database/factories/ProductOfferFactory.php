@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class ProductOfferFactory extends Factory
         $sold = $limit === null ? fake()->numberBetween(int1: 0, int2: 100) : fake()->numberBetween(int1: 0, int2: $limit);
 
         return [
-            'product_id' => Product::factory(),
+            'product_variant_id' => ProductVariant::factory(),
             'offer_price' => fake()->randomFloat(nbMaxDecimals: 2, min: 20, max: 5000),
             'starts_at' => fake()->optional()->dateTimeBetween(startDate: '-7 days', endDate: '+7 days'),
             'ends_at' => fake()->optional()->dateTimeBetween(startDate: '+8 days', endDate: '+30 days'),

@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('storage_options', function (Blueprint $table) {
+        Schema::create('specs', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->unsignedInteger('value_gb');
+            $table->foreignId('spec_type_id')->constrained()->cascadeOnDelete();
+            $table->string('value');
             $table->timestamps();
+
+            $table->unique(['spec_type_id', 'value']);
         });
     }
 
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('storage_options');
+        Schema::dropIfExists('specs');
     }
 };

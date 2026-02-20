@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
@@ -66,8 +67,8 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
-    public function offers(): HasMany
+    public function offers(): HasManyThrough
     {
-        return $this->hasMany(ProductOffer::class);
+        return $this->hasManyThrough(ProductOffer::class, ProductVariant::class, 'product_id', 'product_variant_id');
     }
 }

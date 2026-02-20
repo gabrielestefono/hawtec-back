@@ -7,7 +7,6 @@ use App\Http\Requests\Api\FilterProductsRequest;
 use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 
 class FilterProductsAction
@@ -47,12 +46,17 @@ class FilterProductsAction
     protected function applyPriceRange(Builder $query, ?float $priceMin, ?float $priceMax): void
     {
         if ($priceMin !== null || $priceMax !== null) {
-            $query->whereHas(relation: 'variants', callback: function (Builder $q) use ($priceMin, $priceMax): void {
+            $now = now();
+
+            $query->whereHas(relation: 'variants', callback: function (Builder $q) use ($priceMin, $priceMax, $now): void {
+                $offerPriceSubquery = 'SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1';
+                $effectivePriceExpression = "COALESCE(({$offerPriceSubquery}), price)";
+
                 if ($priceMin !== null) {
-                    $q->where(column: 'price', operator: '>=', value: $priceMin);
+                    $q->whereRaw(sql: "{$effectivePriceExpression} >= ?", bindings: [$now, $now, $priceMin]);
                 }
                 if ($priceMax !== null) {
-                    $q->where(column: 'price', operator: '<=', value: $priceMax);
+                    $q->whereRaw(sql: "{$effectivePriceExpression} <= ?", bindings: [$now, $now, $priceMax]);
                 }
             });
         }
@@ -85,7 +89,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereHas(relation: 'offers', callback: fn (Builder $query): mixed => $query->active());
+        $query->whereHas(relation: 'variants.offers', callback: fn (Builder $query): mixed => $query->active());
     }
 
     /**
@@ -131,17 +135,12 @@ class FilterProductsAction
      */
     protected function sortByBiggestDiscount(Builder $query): void
     {
-        // Produtos com ofertas ativas primeiro, ordenados por % de desconto
-        $query->orderByRaw(sql: 'CASE 
-                    WHEN EXISTS (
-                        SELECT 1 FROM product_offers 
-                        WHERE product_offers.product_id = products.id 
-                        AND product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()
-                        AND product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW()
-                    ) 
-                    THEN ((products.price - (SELECT offer_price FROM product_offers WHERE product_offers.product_id = products.id LIMIT 1)) / products.price * 100) 
-                    ELSE 0 
-                END DESC')
+        $now = now();
+
+        $query->orderByRaw(
+            sql: 'COALESCE((SELECT MAX((product_variants.price - product_offers.offer_price) / product_variants.price * 100) FROM product_variants INNER JOIN product_offers ON product_offers.product_variant_id = product_variants.id WHERE product_variants.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)), 0) DESC',
+            bindings: [$now, $now]
+        )
             ->orderBy(column: 'products.created_at', direction: 'desc');
     }
 
@@ -169,7 +168,12 @@ class FilterProductsAction
      */
     protected function sortByHighestPrice(Builder $query): void
     {
-        $query->orderByRaw(sql: 'COALESCE((SELECT MAX(price) FROM product_variants WHERE product_variants.product_id = products.id LIMIT 1), 0) DESC');
+        $now = now();
+
+        $query->orderByRaw(
+            sql: 'COALESCE((SELECT MAX(COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)) FROM product_variants WHERE product_variants.product_id = products.id), 0) DESC',
+            bindings: [$now, $now]
+        );
     }
 
     /**
@@ -177,7 +181,12 @@ class FilterProductsAction
      */
     protected function sortByLowestPrice(Builder $query): void
     {
-        $query->orderByRaw(sql: 'COALESCE((SELECT MIN(price) FROM product_variants WHERE product_variants.product_id = products.id LIMIT 1), 0) ASC');
+        $now = now();
+
+        $query->orderByRaw(
+            sql: 'COALESCE((SELECT MIN(COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)) FROM product_variants WHERE product_variants.product_id = products.id), 0) ASC',
+            bindings: [$now, $now]
+        );
     }
 
     /**
@@ -187,7 +196,12 @@ class FilterProductsAction
      */
     protected function sortByMostRelevant(Builder $query): void
     {
-        $query->orderByRaw(sql: 'CASE WHEN EXISTS (SELECT 1 FROM product_offers WHERE product_offers.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= NOW()) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= NOW())) THEN 1 ELSE 0 END DESC')
+        $now = now();
+
+        $query->orderByRaw(
+            sql: 'CASE WHEN EXISTS (SELECT 1 FROM product_variants INNER JOIN product_offers ON product_offers.product_variant_id = product_variants.id WHERE product_variants.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)) THEN 1 ELSE 0 END DESC',
+            bindings: [$now, $now]
+        )
             ->orderBy(column: 'reviews_avg_rating', direction: 'desc')
             ->orderBy(column: 'reviews_count', direction: 'desc')
             ->orderBy(column: 'products.created_at', direction: 'desc');
@@ -216,8 +230,7 @@ class FilterProductsAction
                 relations: [
                     'category:id,name',
                     'images',
-                    'variants',
-                    'offers' => fn (HasMany $query): mixed => $query->active(),
+                    'variants' => fn (Builder $query): Builder => $query->with(['offers' => fn (Builder $query): Builder => $query->active()]),
                 ]
             )
             ->withCount(relations: 'reviews')

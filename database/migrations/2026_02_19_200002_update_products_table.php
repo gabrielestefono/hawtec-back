@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasColumn('products', 'price') && ! Schema::hasColumn('products', 'sku') && ! Schema::hasColumn('products', 'badge')) {
+            return;
+        }
+
         Schema::table('products', function (Blueprint $table) {
             $table->dropColumn(['price', 'sku', 'badge']);
         });
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasColumn('products', 'price') && Schema::hasColumn('products', 'sku') && Schema::hasColumn('products', 'badge')) {
+            return;
+        }
+
         Schema::table('products', function (Blueprint $table) {
             $table->decimal('price', 10, 2)->after('brand');
             $table->string('sku')->nullable()->unique()->after('price');

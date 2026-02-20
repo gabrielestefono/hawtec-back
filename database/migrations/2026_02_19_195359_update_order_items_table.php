@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('product_variants') || Schema::hasColumn('order_items', 'product_variant_id')) {
+            return;
+        }
+
         Schema::table('order_items', function (Blueprint $table) {
             $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->cascadeOnDelete();
         });
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasColumn('order_items', 'product_variant_id')) {
+            return;
+        }
+
         Schema::table('order_items', function (Blueprint $table) {
-            $table->dropForeignIdFor('product_variants');
+            $table->dropConstrainedForeignId('product_variant_id');
         });
     }
 };

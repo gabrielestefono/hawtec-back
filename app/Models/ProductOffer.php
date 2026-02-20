@@ -11,7 +11,6 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int|null $product_id
  * @property int|null $product_variant_id
  * @property string $offer_price
  * @property Carbon|null $starts_at
@@ -27,7 +26,6 @@ class ProductOffer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id',
         'product_variant_id',
         'offer_price',
         'starts_at',
@@ -45,11 +43,6 @@ class ProductOffer extends Model
             'quantity_limit' => 'integer',
             'quantity_sold' => 'integer',
         ];
-    }
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
     }
 
     public function variant(): BelongsTo

@@ -4,6 +4,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductOffer;
 use App\Models\ProductReview;
+use App\Models\ProductVariant;
 use App\Models\User;
 
 test('can list products', function (): void {
@@ -64,9 +65,14 @@ test('can filter products by multiple categories', function (): void {
 });
 
 test('can filter products by price range', function (): void {
-    Product::factory()->create(['price' => 100]);
-    Product::factory()->create(['price' => 500]);
-    Product::factory()->create(['price' => 1000]);
+    $productLow = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productLow->id, 'price' => 100]);
+
+    $productMid = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productMid->id, 'price' => 500]);
+
+    $productHigh = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productHigh->id, 'price' => 1000]);
 
     $response = $this->getJson('/api/products?price_min=200&price_max=800');
 
@@ -75,9 +81,13 @@ test('can filter products by price range', function (): void {
 });
 
 test('can filter only products with offers', function (): void {
-    $productWithOffer = Product::factory()->create(['price' => 1000]);
-    ProductOffer::factory()->create([
+    $productWithOffer = Product::factory()->create();
+    $variant = ProductVariant::factory()->create([
         'product_id' => $productWithOffer->id,
+        'price' => 1000,
+    ]);
+    ProductOffer::factory()->create([
+        'product_variant_id' => $variant->id,
         'offer_price' => 800,
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
@@ -92,8 +102,16 @@ test('can filter only products with offers', function (): void {
 });
 
 test('can filter only products in stock', function (): void {
-    Product::factory()->count(3)->create(['stock_quantity' => 10]);
-    Product::factory()->count(2)->create(['stock_quantity' => 0]);
+    $inStockProducts = Product::factory()->count(3)->create();
+    $outOfStockProducts = Product::factory()->count(2)->create();
+
+    $inStockProducts->each(function (Product $product): void {
+        ProductVariant::factory()->create(['product_id' => $product->id, 'stock_quantity' => 10]);
+    });
+
+    $outOfStockProducts->each(function (Product $product): void {
+        ProductVariant::factory()->create(['product_id' => $product->id, 'stock_quantity' => 0]);
+    });
 
     $response = $this->getJson('/api/products?in_stock=1');
 
@@ -140,17 +158,19 @@ test('can sort products by newest', function (): void {
 });
 
 test('can sort products by biggest discount', function (): void {
-    $product1 = Product::factory()->create(['price' => 1000]);
+    $product1 = Product::factory()->create();
+    $variant1 = ProductVariant::factory()->create(['product_id' => $product1->id, 'price' => 1000]);
     ProductOffer::factory()->create([
-        'product_id' => $product1->id,
+        'product_variant_id' => $variant1->id,
         'offer_price' => 500, // 50% desconto
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
     ]);
 
-    $product2 = Product::factory()->create(['price' => 1000]);
+    $product2 = Product::factory()->create();
+    $variant2 = ProductVariant::factory()->create(['product_id' => $product2->id, 'price' => 1000]);
     ProductOffer::factory()->create([
-        'product_id' => $product2->id,
+        'product_variant_id' => $variant2->id,
         'offer_price' => 700, // 30% desconto
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDay(),
@@ -166,9 +186,14 @@ test('can sort products by biggest discount', function (): void {
 });
 
 test('can sort products by lowest price', function (): void {
-    Product::factory()->create(['price' => 1000]);
-    Product::factory()->create(['price' => 500]);
-    Product::factory()->create(['price' => 1500]);
+    $productHigh = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productHigh->id, 'price' => 1000]);
+
+    $productLow = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productLow->id, 'price' => 500]);
+
+    $productHighest = Product::factory()->create();
+    ProductVariant::factory()->create(['product_id' => $productHighest->id, 'price' => 1500]);
 
     $response = $this->getJson('/api/products?sort_by=lowest_price');
 

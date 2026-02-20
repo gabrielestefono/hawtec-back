@@ -11,12 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('product_variants')) {
+            return;
+        }
+
         Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropColumn(['color', 'storage', 'ram', 'voltage']);
-            $table->foreignId('color_id')->nullable()->constrained('product_colors')->nullOnDelete();
-            $table->foreignId('storage_id')->nullable()->constrained('storage_options')->nullOnDelete();
-            $table->foreignId('ram_id')->nullable()->constrained('ram_options')->nullOnDelete();
-            $table->enum('voltage', ['110v', '220v', '110/220v'])->nullable();
+            if (Schema::hasColumn('product_variants', 'color')) {
+                $table->dropColumn(['color', 'storage', 'ram', 'voltage']);
+            }
+
+            if (! Schema::hasColumn('product_variants', 'color_id')) {
+                $table->foreignId('color_id')->nullable()->constrained('product_colors')->nullOnDelete();
+            }
+
+            if (! Schema::hasColumn('product_variants', 'storage_id')) {
+                $table->foreignId('storage_id')->nullable()->constrained('storage_options')->nullOnDelete();
+            }
+
+            if (! Schema::hasColumn('product_variants', 'ram_id')) {
+                $table->foreignId('ram_id')->nullable()->constrained('ram_options')->nullOnDelete();
+            }
+
+            if (! Schema::hasColumn('product_variants', 'voltage')) {
+                $table->enum('voltage', ['110v', '220v', '110/220v'])->nullable();
+            }
         });
     }
 
@@ -25,15 +43,33 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('product_variants')) {
+            return;
+        }
+
         Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropForeignIdFor('product_colors');
-            $table->dropForeignIdFor('storage_options');
-            $table->dropForeignIdFor('ram_options');
-            $table->dropColumn('voltage');
-            $table->string('color')->nullable();
-            $table->string('storage')->nullable();
-            $table->string('ram')->nullable();
-            $table->string('voltage')->nullable();
+            if (Schema::hasColumn('product_variants', 'color_id')) {
+                $table->dropConstrainedForeignId('color_id');
+            }
+
+            if (Schema::hasColumn('product_variants', 'storage_id')) {
+                $table->dropConstrainedForeignId('storage_id');
+            }
+
+            if (Schema::hasColumn('product_variants', 'ram_id')) {
+                $table->dropConstrainedForeignId('ram_id');
+            }
+
+            if (Schema::hasColumn('product_variants', 'voltage')) {
+                $table->dropColumn('voltage');
+            }
+
+            if (! Schema::hasColumn('product_variants', 'color')) {
+                $table->string('color')->nullable();
+                $table->string('storage')->nullable();
+                $table->string('ram')->nullable();
+                $table->string('voltage')->nullable();
+            }
         });
     }
 };

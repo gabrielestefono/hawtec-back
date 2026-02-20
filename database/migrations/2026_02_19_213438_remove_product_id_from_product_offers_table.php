@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('product_variants') || Schema::hasColumn('product_offers', 'product_variant_id')) {
-            return;
-        }
-
         Schema::table('product_offers', function (Blueprint $table) {
-            $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->cascadeOnDelete();
+            if (Schema::hasColumn('product_offers', 'product_id')) {
+                $table->dropConstrainedForeignId('product_id');
+            }
         });
     }
 
@@ -25,12 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (! Schema::hasColumn('product_offers', 'product_variant_id')) {
-            return;
-        }
-
         Schema::table('product_offers', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('product_variant_id');
+            if (! Schema::hasColumn('product_offers', 'product_id')) {
+                $table->foreignId('product_id')->nullable()->constrained('products')->cascadeOnDelete();
+            }
         });
     }
 };

@@ -14,24 +14,15 @@ class OffersAction
         $now = now();
 
         $products = Product::query()
-            ->whereHas(relation: 'offers', callback: function (Builder $query) use ($now): void {
-                $query
-                    ->where(column: function (Builder $q) use ($now): void {
-                        $q->whereNull(columns: 'starts_at')
-                            ->orWhere(column: 'starts_at', operator: '<=', value: $now);
-                    })
-                    ->where(column: function (Builder $q) use ($now): void {
-                        $q->whereNull(columns: 'ends_at')
-                            ->orWhere(column: 'ends_at', operator: '>=', value: $now);
-                    });
-            })
-            ->with(relations: ['images', 'offers', 'category'])
+            ->whereHas(relation: 'variants.offers', callback: fn (Builder $query): Builder => $query->active())
+            ->with(relations: ['images', 'variants' => fn (Builder $query): Builder => $query->with(['offers' => fn (Builder $query): Builder => $query->active()]), 'category'])
             ->withCount(relations: 'reviews')
             ->withAvg(relation: 'reviews', column: 'rating')
             ->get();
 
         return $products->map(callback: function (Product $product): Product {
             $product->reviews_rating = ProductHelper::getReviewAverageRating(product: $product);
+
             return $product;
         });
     }
