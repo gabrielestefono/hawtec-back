@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int|null $product_variant_id
- * @property string $offer_price
+ * @property int $offer_price
  * @property Carbon|null $starts_at
  * @property Carbon|null $ends_at
  * @property int|null $quantity_limit
@@ -24,6 +24,8 @@ class ProductOffer extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductOfferFactory> */
     use HasFactory;
+
+    protected $appends = [];
 
     protected $fillable = [
         'product_variant_id',
@@ -37,12 +39,21 @@ class ProductOffer extends Model
     protected function casts(): array
     {
         return [
-            'offer_price' => 'decimal:2',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'quantity_limit' => 'integer',
             'quantity_sold' => 'integer',
         ];
+    }
+
+    public function setOfferPriceAttribute($value): void
+    {
+        $this->attributes['offer_price'] = (int) ($value * 100);
+    }
+
+    public function getOfferPriceAttribute()
+    {
+        return $this->attributes['offer_price'] / 100;
     }
 
     public function variant(): BelongsTo

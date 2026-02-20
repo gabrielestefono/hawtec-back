@@ -50,6 +50,17 @@ class ProductVariantResource extends Resource
                             ->required()
                             ->maxLength(length: 255)
                             ->unique(ignoreRecord: true),
+                        TextInput::make(name: 'slug')
+                            ->label(label: 'Slug')
+                            ->helperText(text: 'URL-friendly identifier. Ex: xiaomi-redmi-128gb')
+                            ->required()
+                            ->maxLength(length: 255)
+                            ->unique(ignoreRecord: true),
+                        TextInput::make(name: 'variant_label')
+                            ->label(label: 'Label da Variante')
+                            ->helperText(text: 'Ex: 128GB • 8GB RAM ou Azul • Pequeno')
+                            ->required()
+                            ->maxLength(length: 255),
                         TextInput::make(name: 'price')
                             ->label(label: 'Preço')
                             ->required()
@@ -75,6 +86,14 @@ class ProductVariantResource extends Resource
             ->columns(components: [
                 TextColumn::make(name: 'product.name')
                     ->label(label: 'Produto')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make(name: 'variant_label')
+                    ->label(label: 'Label')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make(name: 'slug')
+                    ->label(label: 'Slug')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make(name: 'sku')

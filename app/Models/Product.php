@@ -14,7 +14,6 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
- * @property string $slug
  * @property string|null $description
  * @property string|null $long_description
  * @property string|null $brand
@@ -35,7 +34,6 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'slug',
         'description',
         'long_description',
         'brand',

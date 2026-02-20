@@ -2,91 +2,97 @@
 
 namespace App\Actions\Landing;
 
-use App\Models\Product;
 use App\Models\ProductBadge;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
 
 class ProductAction
 {
     public function handle(): Collection
     {
-        return Product::query()
-            ->with(
-                relations: [
-                    'images',
-                    'variants' => function (HasMany $query): void {
-                        $query->with(relations: ['offers']);
-                    },
-                    'category',
-                    'badges',
-                ]
-            )
+        return ProductVariant::query()
+            ->with(['product', 'product.images', 'product.badges', 'offers'])
+            ->limit(8)
             ->get()
-            ->map(
-                callback: function (Product $product): Product {
-                    $primaryImage = $product->images()
-                        ->where(column: 'is_primary', operator: true)
-                        ->first()
-                        ?? $product->images()->first();
+            ->map(function (ProductVariant $variant): ProductVariant {
+                $now = now();
+                $product = $variant->product;
 
-                    $product->setRelation(relation: 'image', value: $primaryImage);
+                if ($product) {
+                    $images = $product->images;
+
+                    $primaryImage = $images
+                        ->where('is_primary', true)
+                        ->sortByDesc('id')
+                        ->first();
+
+                    $lastImage = $images
+                        ->sortByDesc('id')
+                        ->first();
+
+                    $product->image = $primaryImage ?? $lastImage;
+
                     unset($product->images);
-
-                    // Pegar apenas a primeira oferta ativa de cada variante
-                    $hasActiveOffer = false;
-                    foreach ($product->variants as $variant) {
-                        /**
-                         * @var HasMany $offers
-                         */
-                        $offers = $variant->offers();
-                        $firstActiveOffer = $offers->first();
-                        $variant->setRelation(relation: 'offer', value: $firstActiveOffer);
-                        unset($variant->offers);
-
-                        if ($firstActiveOffer) {
-                            $hasActiveOffer = true;
-                        }
-                    }
-
-                    // Lógica de badge
-                    if ($hasActiveOffer) {
-                        // Criar badge de desconto dinamicamente
-                        $discountBadge = new ProductBadge(
-                            attributes: [
-                                'product_id' => $product->id,
-                                'badge_type' => 'discount',
-                                'valid_from' => null,
-                                'valid_until' => null,
-                            ]
-                        );
-                        $product->setRelation(relation: 'badge', value: $discountBadge);
-                    } else {
-                        // Buscar primeira badge ativa
-                        $activeBadge = $product->badges()
-                            ->where(
-                                column: function (HasMany $query): void {
-                                    $query
-                                        ->whereNull(columns: 'valid_from')
-                                        ->orWhere(column: 'valid_from', operator: '<=', value: now());
-                                }
-                            )
-                            ->where(
-                                column: function (HasMany $query): void {
-                                    $query
-                                        ->whereNull(columns: 'valid_until')
-                                        ->orWhere(column: 'valid_until', operator: '>=', value: now());
-                                }
-                            )
-                            ->first();
-
-                        $product->setRelation(relation: 'badge', value: $activeBadge);
-                    }
-
-                    unset($product->badges);
-
-                    return $product;
                 }
-            );
+
+                $offer = $variant->offers
+                    ->filter(function ($offer) use ($now): bool {
+                        $startsAt = $offer->starts_at;
+                        $endsAt = $offer->ends_at;
+
+                        $withinDateRange =
+                            ($startsAt === null || $startsAt <= $now)
+                            && ($endsAt === null || $endsAt >= $now);
+
+                        $hasQuantity =
+                            $offer->quantity_limit === null
+                            || $offer->quantity_sold < $offer->quantity_limit;
+
+                        return $withinDateRange && $hasQuantity;
+                    })
+                    ->sortByDesc('id')
+                    ->first();
+
+                $variant->offer = $offer;
+
+                if ($offer) {
+                    $badge = new ProductBadge([
+                        'product_id' => $product?->id,
+                        'badge_type' => 'discount',
+                        'valid_from' => null,
+                        'valid_until' => null,
+                    ]);
+
+                    $price = $variant->price;
+                    $offerPrice = $offer->offer_price;
+
+                    $discountPercentage = null;
+
+                    if ($price !== null && $price > 0 && $offerPrice !== null) {
+                        $discount = (($price - $offerPrice) / $price) * 100;
+                        $discountPercentage = max(0, (int) round($discount));
+                    }
+
+                    $badge->discountPercentage = $discountPercentage;
+                } else {
+                    $badge = $product?->badges
+                        ->filter(function (ProductBadge $badge) use ($now): bool {
+                            $validFrom = $badge->valid_from;
+                            $validUntil = $badge->valid_until;
+
+                            $withinDateRange =
+                                ($validFrom === null || $validFrom <= $now)
+                                && ($validUntil === null || $validUntil >= $now);
+
+                            return $withinDateRange;
+                        })
+                        ->sortByDesc('id')
+                        ->first();
+                }
+
+                $variant->badge = $badge;
+
+                return $variant;
+            });
     }
 }

@@ -20,6 +20,7 @@ class LandingAction
                     'bestsellers' => (new BestsellerAction)->handle(),
                 ],
             ]
+            // data: (new ProductAction)->handle()
         );
     }
 }
