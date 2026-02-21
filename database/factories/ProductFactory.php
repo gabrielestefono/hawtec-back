@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,33 +17,12 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->words(nb: 3, asText: true);
-
         return [
-            'name' => $name,
-            'slug' => fake()->slug(),
-            'description' => fake()->optional()->sentence(nbWords: 6),
-            'long_description' => fake()->optional()->paragraphs(nb: 2, asText: true),
-            'brand' => fake()->optional()->word(),
-            'product_category_id' => 1,
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->sentence(),
+            'long_description' => $this->faker->paragraphs(3, true),
+            'brand' => $this->faker->word(),
+            'product_category_id' => ProductCategory::factory(),
         ];
-    }
-
-    public function withVariants(int $count = 3): self
-    {
-        return $this->afterCreating(function ($product) use ($count) {
-            $product->variants()->createMany(
-                ProductVariantFactory::new()->count($count)->make()->toArray()
-            );
-        });
-    }
-
-    public function withBadges(int $count = 1): self
-    {
-        return $this->afterCreating(function ($product) use ($count) {
-            $product->badges()->createMany(
-                ProductBadgeFactory::new()->count($count)->make()->toArray()
-            );
-        });
     }
 }

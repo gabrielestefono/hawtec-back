@@ -11,9 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Slug já existe em product_variants, apenas remover de products
+        // Adicionar slug em product_variants
+        Schema::table('product_variants', function (Blueprint $table) {
+            if (!Schema::hasColumn('product_variants', 'slug')) {
+                $table->string('slug')->nullable();
+            }
+        });
+
+        // Remover slug de products
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('slug');
+            if (Schema::hasColumn('products', 'slug')) {
+                $table->dropColumn('slug');
+            }
         });
     }
 

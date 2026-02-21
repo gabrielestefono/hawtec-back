@@ -53,34 +53,42 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Revert product_variants
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->renameColumn('price', 'price_cents');
-        });
+        // Revert product_variants - use safe column drop
+        if (Schema::hasColumn('product_variants', 'price')) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->renameColumn('price', 'price_cents');
+            });
+        }
 
         Schema::table('product_variants', function (Blueprint $table) {
-            $table->decimal('price', 10, 2)->after('voltage');
+            $table->decimal('price', 10, 2);
         });
 
-        \DB::statement('UPDATE product_variants SET price = price_cents / 100');
+        if (Schema::hasColumn('product_variants', 'price_cents')) {
+            \DB::statement('UPDATE product_variants SET price = price_cents / 100');
 
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropColumn('price_cents');
-        });
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->dropColumn('price_cents');
+            });
+        }
 
         // Revert product_offers
-        Schema::table('product_offers', function (Blueprint $table) {
-            $table->renameColumn('offer_price', 'offer_price_cents');
-        });
+        if (Schema::hasColumn('product_offers', 'offer_price')) {
+            Schema::table('product_offers', function (Blueprint $table) {
+                $table->renameColumn('offer_price', 'offer_price_cents');
+            });
+        }
 
         Schema::table('product_offers', function (Blueprint $table) {
             $table->decimal('offer_price', 10, 2)->after('product_variant_id');
         });
 
-        \DB::statement('UPDATE product_offers SET offer_price = offer_price_cents / 100');
+        if (Schema::hasColumn('product_offers', 'offer_price_cents')) {
+            \DB::statement('UPDATE product_offers SET offer_price = offer_price_cents / 100');
 
-        Schema::table('product_offers', function (Blueprint $table) {
-            $table->dropColumn('offer_price_cents');
-        });
+            Schema::table('product_offers', function (Blueprint $table) {
+                $table->dropColumn('offer_price_cents');
+            });
+        }
     }
 };

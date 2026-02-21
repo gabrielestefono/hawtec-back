@@ -26,9 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('product_reviews', function (Blueprint $table) {
-            $table->dropForeignKeyIfExists(['product_variant_id']);
-            $table->dropIndexIfExists('product_reviews_product_variant_id_index');
-            $table->dropColumn('product_variant_id');
+            $table->dropConstrainedForeignId('product_variant_id');
         });
     }
 };

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductCategory>
@@ -16,20 +17,13 @@ class ProductCategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->word();
+
         return [
-            'name' => fake()->randomElement([
-                'Eletrônicos',
-                'Informática',
-                'Celulares',
-                'Eletrodomésticos',
-                'Casa e Decoração',
-                'Moda',
-                'Esportes',
-                'Livros',
-            ]),
-            'description' => fake()->sentence(),
-            'icon' => fake()->word(),
-            'slug' => fake()->slug(),
+            'name' => $name,
+            'description' => $this->faker->sentence(),
+            'icon' => 'heroicon-o-tag',
+            'slug' => Str::slug($name),
         ];
     }
 }

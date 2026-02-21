@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Banner;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class BannerSeeder extends Seeder
@@ -12,26 +13,13 @@ class BannerSeeder extends Seeder
      */
     public function run(): void
     {
-        Banner::factory()
-            ->count(count: 5)
-            ->create(attributes: [
-                'is_active' => true,
-                'starts_at' => now()->subDays(days: 10),
-                'ends_at' => now()->addDays(days: 30),
+        Banner::factory(3)->create()->each(function (Banner $banner): void {
+            $banner->images()->create([
+                'path' => 'banners/logo.webp',
+                'alt' => 'Banner ' . $banner->title,
+                'sort' => 0,
+                'is_primary' => true,
             ]);
-
-        Banner::factory()
-            ->count(count: 2)
-            ->create(attributes: [
-                'is_active' => true,
-                'starts_at' => now()->addDays(days: 5),
-                'ends_at' => now()->addDays(days: 45),
-            ]);
-
-        Banner::factory()
-            ->count(count: 2)
-            ->create(attributes: [
-                'is_active' => false,
-            ]);
+        });
     }
 }

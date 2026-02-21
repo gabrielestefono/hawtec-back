@@ -17,15 +17,15 @@ class BannerFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(nbWords: 3),
-            'subtitle' => fake()->optional()->sentence(nbWords: 6),
-            'description' => fake()->optional()->paragraph(),
-            'button_label' => fake()->optional()->words(nb: 2, asText: true),
-            'button_url' => fake()->optional()->url(),
-            'is_active' => fake()->boolean(chanceOfGettingTrue: 80),
-            'sort' => fake()->numberBetween(int1: 0, int2: 100),
-            'starts_at' => fake()->optional()->dateTimeBetween(startDate: '-1 month', endDate: '+1 month'),
-            'ends_at' => fake()->optional()->dateTimeBetween(startDate: '+1 month', endDate: '+3 months'),
+            'title' => $this->faker->sentence(),
+            'subtitle' => $this->faker->sentence(),
+            'description' => $this->faker->paragraph(),
+            'button_label' => $this->faker->word(),
+            'button_url' => $this->faker->url(),
+            'is_active' => true,
+            'sort' => $this->faker->numberBetween(0, 10),
+            'starts_at' => now(),
+            'ends_at' => now()->addMonth(),
         ];
     }
 }
