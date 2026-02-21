@@ -2,75 +2,108 @@
 
 namespace App\Actions\Landing;
 
+use App\Models\ProductBadge;
 use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BestsellerAction
 {
     public function handle(): Collection
     {
-        // Retorna variantes ordenadas por vendas (quando houver dados de pedidos)
         return ProductVariant::query()
-            ->with(
-                relations: [
-                    'product' => function ($query): void {
-                        $query->with(['images', 'category', 'badges']);
-                    },
-                    'offers',
-                ]
-            )
-            ->orderByRaw('RAND()')
+            ->leftJoin('order_items', 'product_variants.id', '=', 'order_items.product_variant_id')
+            ->select('product_variants.*', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->groupBy('product_variants.id')
+            ->orderByDesc('total_sold')
+            ->with(['product', 'product.images', 'product.badges', 'offers'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->limit(8)
             ->get()
-            ->map(
-                callback: function (ProductVariant $variant): ProductVariant {
-                    $product = $variant->product;
+            ->map(function (ProductVariant $variant): ProductVariant {
+                $now = now();
+                $product = $variant->product;
 
-                    $primaryImage = $product->images()
-                        ->where(column: 'is_primary', operator: true)
-                        ->first()
-                        ?? $product->images()->first();
+                if ($product) {
+                    $images = $product->images;
 
-                    $firstActiveOffer = $variant->offers()->first();
+                    $primaryImage = $images
+                        ->where('is_primary', true)
+                        ->sortByDesc('id')
+                        ->first();
 
-                    if ($firstActiveOffer) {
-                        $badge = new \App\Models\ProductBadge(
-                            attributes: [
-                                'product_id' => $product->id,
-                                'badge_type' => 'discount',
-                                'valid_from' => null,
-                                'valid_until' => null,
-                            ]
-                        );
-                    } else {
-                        $badge = $product->badges()
-                            ->where(
-                                column: function ($query): void {
-                                    $query
-                                        ->whereNull(columns: 'valid_from')
-                                        ->orWhere(column: 'valid_from', operator: '<=', value: now());
-                                }
-                            )
-                            ->where(
-                                column: function ($query): void {
-                                    $query
-                                        ->whereNull(columns: 'valid_until')
-                                        ->orWhere(column: 'valid_until', operator: '>=', value: now());
-                                }
-                            )
-                            ->first();
+                    $lastImage = $images
+                        ->sortByDesc('id')
+                        ->first();
+
+                    $product->image = $primaryImage ?? $lastImage;
+
+                    unset($product->images);
+                }
+
+                $offer = $variant->offers
+                    ->filter(function ($offer) use ($now): bool {
+                        $startsAt = $offer->starts_at;
+                        $endsAt = $offer->ends_at;
+
+                        $withinDateRange =
+                            ($startsAt === null || $startsAt <= $now)
+                            && ($endsAt === null || $endsAt >= $now);
+
+                        $hasQuantity =
+                            $offer->quantity_limit === null
+                            || $offer->quantity_sold < $offer->quantity_limit;
+
+                        return $withinDateRange && $hasQuantity;
+                    })
+                    ->sortByDesc('id')
+                    ->first();
+
+                $variant->offer = $offer;
+
+                if ($offer) {
+                    $badge = new ProductBadge([
+                        'product_id' => $product?->id,
+                        'badge_type' => 'discount',
+                        'valid_from' => null,
+                        'valid_until' => null,
+                    ]);
+
+                    $price = $variant->price;
+                    $offerPrice = $offer->offer_price;
+
+                    $discountPercentage = null;
+
+                    if ($price !== null && $price > 0 && $offerPrice !== null) {
+                        $discount = (($price - $offerPrice) / $price) * 100;
+                        $discountPercentage = max(0, (int) round($discount));
                     }
 
-                    $variant->product_name = $product->name;
-                    $variant->product_brand = $product->brand;
-                    $variant->product_image = $primaryImage;
-                    $variant->badge = $badge;
-                    $variant->offer = $firstActiveOffer;
+                    $badge->discountPercentage = $discountPercentage;
+                } else {
+                    $badge = $product?->badges
+                        ->filter(function (ProductBadge $badge) use ($now): bool {
+                            $validFrom = $badge->valid_from;
+                            $validUntil = $badge->valid_until;
 
-                    unset($variant->product);
+                            $withinDateRange =
+                                ($validFrom === null || $validFrom <= $now)
+                                && ($validUntil === null || $validUntil >= $now);
 
-                    return $variant;
+                            return $withinDateRange;
+                        })
+                        ->sortByDesc('id')
+                        ->first();
                 }
-            );
+
+                $variant->badge = $badge;
+
+                $variant->reviews_avg_rating = $variant->reviews_avg_rating
+                    ? (int) round($variant->reviews_avg_rating)
+                    : null;
+
+                return $variant;
+            });
     }
 }
