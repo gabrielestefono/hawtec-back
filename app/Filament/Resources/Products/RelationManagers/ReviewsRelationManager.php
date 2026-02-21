@@ -62,7 +62,7 @@ class ReviewsRelationManager extends RelationManager
                 TextColumn::make(name: 'rating')
                     ->label(label: 'Nota')
                     ->badge()
-                    ->color(state: fn (int $state): string => match ($state) {
+                    ->color(fn (int $state): string => match ($state) {
                         1, 2 => 'danger',
                         3 => 'warning',
                         4, 5 => 'success',
@@ -71,8 +71,8 @@ class ReviewsRelationManager extends RelationManager
                 TextColumn::make(name: 'verified')
                     ->label(label: 'Verificada')
                     ->badge()
-                    ->color(state: fn (bool $state): string => $state ? 'success' : 'gray')
-                    ->formatStateUsing(state: fn (bool $state): string => $state ? 'Sim' : 'Nao')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Sim' : 'Nao')
                     ->sortable(),
                 TextColumn::make(name: 'created_at')
                     ->label(label: 'Data')

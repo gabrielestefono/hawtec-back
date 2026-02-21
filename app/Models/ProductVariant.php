@@ -35,52 +35,25 @@ class ProductVariant extends Model
     /** @use HasFactory<\Database\Factories\ProductVariantFactory> */
     use HasFactory;
 
-    protected $appends = ['price'];
+    protected $appends = [];
 
-    protected $hidden = ['price_cents'];
+    protected $hidden = [];
 
     protected $fillable = [
         'product_id',
         'sku',
         'slug',
         'variant_label',
-        'color_id',
-        'storage_id',
-        'ram_id',
-        'voltage',
         'price',
-        'price_cents',
         'stock_quantity',
     ];
 
     protected function casts(): array
     {
         return [
-            'price_cents' => 'integer',
+            'price' => 'integer',
             'stock_quantity' => 'integer',
         ];
-    }
-
-    public function setPriceAttribute(float|int|string|null $value): void
-    {
-        if ($value === null) {
-            $this->attributes['price_cents'] = null;
-
-            return;
-        }
-
-        $this->attributes['price_cents'] = (int) round($value * 100);
-    }
-
-    public function getPriceAttribute($value): ?float
-    {
-        $cents = $this->attributes['price_cents'] ?? $value;
-
-        if ($cents === null) {
-            return null;
-        }
-
-        return $cents / 100;
     }
 
     public function product(): BelongsTo

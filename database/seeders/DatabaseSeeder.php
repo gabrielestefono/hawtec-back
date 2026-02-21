@@ -29,5 +29,26 @@ class DatabaseSeeder extends Seeder
 
         // Call product seeder
         $this->call(ProductSeeder::class);
+
+        // Call product variant seeder
+        $this->call(ProductVariantSeeder::class);
+
+        // Call spec type seeder
+        $this->call(SpecTypeSeeder::class);
+
+        // Call spec seeder
+        $this->call(SpecSeeder::class);
+
+        // Call product offer seeder
+        $this->call(ProductOfferSeeder::class);
+
+        // Call product badge seeder
+        $this->call(ProductBadgeSeeder::class);
+
+        // Call product review seeder
+        $this->call(ProductReviewSeeder::class);
+
+        // Call image seeder
+        $this->call(ImageSeeder::class);
     }
 }
