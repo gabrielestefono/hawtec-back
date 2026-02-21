@@ -21,5 +21,5 @@ Route::prefix('landing')->group(callback: function (): void {
 
 Route::prefix('products')->group(callback: function (): void {
     Route::get(uri: '/', action: [ProductController::class, 'index']);
-    Route::get(uri: '/{product:slug}', action: [ProductController::class, 'show']);
+    Route::get(uri: '/{variant:slug}', action: [ProductController::class, 'show']);
 });

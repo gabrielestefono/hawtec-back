@@ -6,7 +6,7 @@ use App\Actions\Product\FilterProductsAction;
 use App\Actions\Product\ShowProductAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\FilterProductsRequest;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
@@ -358,8 +358,8 @@ class ProductController extends Controller
             ),
         ]
     )]
-    public function show(Product $product): JsonResponse
+    public function show(ProductVariant $variant): JsonResponse
     {
-        return (new ShowProductAction)->handle(product: $product);
+        return (new ShowProductAction)->handle(variant: $variant);
     }
 }

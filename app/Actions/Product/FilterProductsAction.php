@@ -2,10 +2,9 @@
 
 namespace App\Actions\Product;
 
-use App\Helpers\ImageHelper;
 use App\Http\Requests\Api\FilterProductsRequest;
-use App\Models\Image;
-use App\Models\Product;
+use App\Models\ProductBadge;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 
@@ -20,7 +19,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->where(function (Builder $query) use ($search): void {
+        $query->whereHas(relation: 'product', callback: function (Builder $query) use ($search): void {
             $query->where(column: 'name', operator: 'like', value: "%{$search}%")
                 ->orWhere(column: 'description', operator: 'like', value: "%{$search}%");
         });
@@ -37,7 +36,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereIn(column: 'product_category_id', values: $categories);
+        $query->whereHas(relation: 'product', callback: fn (Builder $query): Builder => $query->whereIn(column: 'product_category_id', values: $categories));
     }
 
     /**
@@ -48,17 +47,15 @@ class FilterProductsAction
         if ($priceMin !== null || $priceMax !== null) {
             $now = now();
 
-            $query->whereHas(relation: 'variants', callback: function (Builder $q) use ($priceMin, $priceMax, $now): void {
-                $offerPriceSubquery = 'SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1';
-                $effectivePriceExpression = "COALESCE(({$offerPriceSubquery}), price)";
+            $offerPriceSubquery = 'SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1';
+            $effectivePriceExpression = "COALESCE(({$offerPriceSubquery}), product_variants.price)";
 
-                if ($priceMin !== null) {
-                    $q->whereRaw(sql: "{$effectivePriceExpression} >= ?", bindings: [$now, $now, $priceMin]);
-                }
-                if ($priceMax !== null) {
-                    $q->whereRaw(sql: "{$effectivePriceExpression} <= ?", bindings: [$now, $now, $priceMax]);
-                }
-            });
+            if ($priceMin !== null) {
+                $query->whereRaw(sql: "{$effectivePriceExpression} >= ?", bindings: [$now, $now, $priceMin]);
+            }
+            if ($priceMax !== null) {
+                $query->whereRaw(sql: "{$effectivePriceExpression} <= ?", bindings: [$now, $now, $priceMax]);
+            }
         }
     }
 
@@ -76,7 +73,7 @@ class FilterProductsAction
         $ratingsPlaceholders = implode(separator: ',', array: $ratings);
 
         $query->whereRaw(
-            sql: "FLOOR(COALESCE((SELECT AVG(rating) FROM product_reviews WHERE product_reviews.product_id = products.id), 0)) IN ({$ratingsPlaceholders})"
+            sql: "FLOOR(COALESCE((SELECT AVG(rating) FROM product_reviews WHERE product_reviews.product_variant_id = product_variants.id), 0)) IN ({$ratingsPlaceholders})"
         );
     }
 
@@ -89,7 +86,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereHas(relation: 'variants.offers', callback: fn (Builder $query): mixed => $query->active());
+        $query->whereHas(relation: 'offers', callback: fn (Builder $query): mixed => $query->active());
     }
 
     /**
@@ -101,7 +98,7 @@ class FilterProductsAction
             return;
         }
 
-        $query->whereHas(relation: 'variants', callback: fn (Builder $q): mixed => $q->where(column: 'stock_quantity', operator: '>', value: 0));
+        $query->where(column: 'stock_quantity', operator: '>', value: 0);
     }
 
     /**
@@ -126,8 +123,8 @@ class FilterProductsAction
      */
     protected function sortByNewest(Builder $query): void
     {
-        $query->orderByRaw(sql: "CASE WHEN badge = 'Lançamento' THEN 0 ELSE 1 END")
-            ->orderBy(column: 'created_at', direction: 'desc');
+        $query->orderByRaw(sql: '(SELECT products.created_at FROM products WHERE products.id = product_variants.product_id) DESC')
+            ->orderBy(column: 'product_variants.created_at', direction: 'desc');
     }
 
     /**
@@ -138,10 +135,10 @@ class FilterProductsAction
         $now = now();
 
         $query->orderByRaw(
-            sql: 'COALESCE((SELECT MAX((product_variants.price - product_offers.offer_price) / product_variants.price * 100) FROM product_variants INNER JOIN product_offers ON product_offers.product_variant_id = product_variants.id WHERE product_variants.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)), 0) DESC',
+            sql: 'COALESCE((SELECT MAX((product_variants.price - product_offers.offer_price) / product_variants.price * 100) FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)), 0) DESC',
             bindings: [$now, $now]
         )
-            ->orderBy(column: 'products.created_at', direction: 'desc');
+            ->orderByRaw(sql: '(SELECT products.created_at FROM products WHERE products.id = product_variants.product_id) DESC');
     }
 
     /**
@@ -150,7 +147,7 @@ class FilterProductsAction
     protected function sortByMostReviewed(Builder $query): void
     {
         $query->orderBy(column: 'reviews_count', direction: 'desc')
-            ->orderBy(column: 'created_at', direction: 'desc');
+            ->orderByRaw(sql: '(SELECT products.created_at FROM products WHERE products.id = product_variants.product_id) DESC');
     }
 
     /**
@@ -160,7 +157,7 @@ class FilterProductsAction
     {
         $query->orderBy(column: 'reviews_avg_rating', direction: 'desc')
             ->orderBy(column: 'reviews_count', direction: 'desc')
-            ->orderBy(column: 'created_at', direction: 'desc');
+            ->orderByRaw(sql: '(SELECT products.created_at FROM products WHERE products.id = product_variants.product_id) DESC');
     }
 
     /**
@@ -171,7 +168,7 @@ class FilterProductsAction
         $now = now();
 
         $query->orderByRaw(
-            sql: 'COALESCE((SELECT MAX(COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)) FROM product_variants WHERE product_variants.product_id = products.id), 0) DESC',
+            sql: 'COALESCE((SELECT COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)), 0) DESC',
             bindings: [$now, $now]
         );
     }
@@ -184,7 +181,7 @@ class FilterProductsAction
         $now = now();
 
         $query->orderByRaw(
-            sql: 'COALESCE((SELECT MIN(COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)) FROM product_variants WHERE product_variants.product_id = products.id), 0) ASC',
+            sql: 'COALESCE((SELECT COALESCE((SELECT offer_price FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit) ORDER BY product_offers.id DESC LIMIT 1), product_variants.price)), 0) ASC',
             bindings: [$now, $now]
         );
     }
@@ -199,12 +196,12 @@ class FilterProductsAction
         $now = now();
 
         $query->orderByRaw(
-            sql: 'CASE WHEN EXISTS (SELECT 1 FROM product_variants INNER JOIN product_offers ON product_offers.product_variant_id = product_variants.id WHERE product_variants.product_id = products.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)) THEN 1 ELSE 0 END DESC',
+            sql: 'CASE WHEN EXISTS (SELECT 1 FROM product_offers WHERE product_offers.product_variant_id = product_variants.id AND (product_offers.starts_at IS NULL OR product_offers.starts_at <= ?) AND (product_offers.ends_at IS NULL OR product_offers.ends_at >= ?) AND (product_offers.quantity_limit IS NULL OR product_offers.quantity_sold < product_offers.quantity_limit)) THEN 1 ELSE 0 END DESC',
             bindings: [$now, $now]
         )
             ->orderBy(column: 'reviews_avg_rating', direction: 'desc')
             ->orderBy(column: 'reviews_count', direction: 'desc')
-            ->orderBy(column: 'products.created_at', direction: 'desc');
+            ->orderByRaw(sql: '(SELECT products.created_at FROM products WHERE products.id = product_variants.product_id) DESC');
     }
 
     public function handle(FilterProductsRequest $request): JsonResponse
@@ -225,12 +222,13 @@ class FilterProductsAction
          */
         $filters = $request->validated();
 
-        $query = Product::query()
+        $query = ProductVariant::query()
             ->with(
                 relations: [
-                    'category:id,name',
-                    'images',
-                    'variants' => fn (Builder $query): Builder => $query->with(['offers' => fn (Builder $query): Builder => $query->active()]),
+                    'product',
+                    'product.images',
+                    'product.badges',
+                    'offers',
                 ]
             )
             ->withCount(relations: 'reviews')
@@ -252,17 +250,89 @@ class FilterProductsAction
 
         $paginatedQuery = $query->paginate(perPage: $perPage);
 
-        $paginatedQuery->getCollection()->transform(callback: function (Product $product): Product {
-            $product->images->map(callback: function (Image $image): Image {
-                $image->url = ImageHelper::getImageUrl(path: $image->path);
+        $paginatedQuery->getCollection()->transform(callback: function (ProductVariant $variant): ProductVariant {
+            $now = now();
+            $product = $variant->product;
 
-                return $image;
-            });
-            /** @var float|int|null $rating */
-            $rating = $product->reviews_avg_rating;
-            $product->reviews_avg_rating = $rating ? round(num: $rating, precision: 1) : null;
+            if ($product) {
+                $images = $product->images;
 
-            return $product;
+                $primaryImage = $images
+                    ->where('is_primary', true)
+                    ->sortByDesc('id')
+                    ->first();
+
+                $lastImage = $images
+                    ->sortByDesc('id')
+                    ->first();
+
+                $product->image = $primaryImage ?? $lastImage;
+
+                unset($product->images);
+            }
+
+            $offer = $variant->offers
+                ->filter(function ($offer) use ($now): bool {
+                    $startsAt = $offer->starts_at;
+                    $endsAt = $offer->ends_at;
+
+                    $withinDateRange =
+                        ($startsAt === null || $startsAt <= $now)
+                        && ($endsAt === null || $endsAt >= $now);
+
+                    $hasQuantity =
+                        $offer->quantity_limit === null
+                        || $offer->quantity_sold < $offer->quantity_limit;
+
+                    return $withinDateRange && $hasQuantity;
+                })
+                ->sortByDesc('id')
+                ->first();
+
+            $variant->offer = $offer;
+
+            if ($offer) {
+                $badge = new ProductBadge([
+                    'product_id' => $product?->id,
+                    'badge_type' => 'discount',
+                    'valid_from' => null,
+                    'valid_until' => null,
+                ]);
+
+                $price = $variant->price;
+                $offerPrice = $offer->offer_price;
+
+                $discountPercentage = null;
+
+                if ($price !== null && $price > 0 && $offerPrice !== null) {
+                    $discount = (($price - $offerPrice) / $price) * 100;
+                    $discountPercentage = max(0, (int) round($discount));
+                }
+
+                $badge->discountPercentage = $discountPercentage;
+            } else {
+                $badge = $product?->badges
+                    ->filter(function (ProductBadge $badge) use ($now): bool {
+                        $validFrom = $badge->valid_from;
+                        $validUntil = $badge->valid_until;
+
+                        $withinDateRange =
+                            ($validFrom === null || $validFrom <= $now)
+                            && ($validUntil === null || $validUntil >= $now);
+
+                        return $withinDateRange;
+                    })
+                    ->sortByDesc('id')
+                    ->first();
+            }
+
+            $variant->badge = $badge;
+
+            $variant->reviews_avg_rating = $variant->reviews_avg_rating
+                ? (int) round($variant->reviews_avg_rating)
+                : null;
+
+            return $variant;
         });
 
         return response()->json(data: [
